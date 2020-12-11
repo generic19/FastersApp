@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="colorGradient1Color1" format="color" />
+    <attr name="colorGradient1Color2" format="color" />
+    <attr name="colorGradient2Color1" format="color" />
+    <attr name="colorGradient2Color2" format="color" />
+
+    <attr name="colorProgressAccent" format="color" />
+
+    <attr name="colorButtonPrimary" format="color" />
+
+
+</resources>

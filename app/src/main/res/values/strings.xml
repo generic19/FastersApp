@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Fasters</string>
+    <string name="shared_preferences_name">com_basilalasadi_fasters_sharedpreferences</string>
+    <string name="set_location">Set Location</string>
+    <string name="city">City</string>
+    <string name="country">Country</string>
+    <string name="ishaa">Ishaa</string>
+    <string name="magrib">Magrib</string>
+    <string name="asr">Asr</string>
+    <string name="duhr">Duhr</string>
+    <string name="fajr">Fajr</string>
+    <string name="prayer_times">Prayer times</string>
+    <string name="time_till">Time till</string>
+    <string name="current_time">Current time</string>
+    <string name="hours">hours</string>
+    <string name="minutes">minutes</string>
+    <string name="time_separator">:</string>
+    <string name="time_until_break_fast">Time until break-fast</string>
+    <string name="subdivision">Subdivision</string>
+    <string name="detect_location">Detect Location</string>
+    <string name="location_dialog_title">Enter location manually</string>
+    <string name="location_dialog_content">The app is unable to detect coarse location. Either turn on location services and accept location permission, or enter it manually.\n\nYour coarse location is needed to request prayer timings that are relevant to your location.</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="automatic_location_summary">This app will only read your general location. It will NOT be sent anywhere, and will only be stored on your device to provide you with timings relevant to you.</string>
+    <string name="automatic_location">Automatic Location</string>
+    <string name="manual_location">Manual Location</string>
+    <string name="manual_location_summary">Alternatively, you can enter your country and city below, and the app will lookup its coordinates in a preloaded database.</string>
+    <string name="locate">Locate</string>
+</resources>

@@ -1,0 +1,209 @@
+<resources>
+
+    <style name="Theme" />
+
+    <style name="Theme.App" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="Theme.App.Morning">
+
+        <item name="colorPrimary">@color/colorSunset1</item>
+        <item name="colorPrimaryDark">@color/colorSunset2</item>
+        <item name="colorAccent">#00B0FF</item>
+
+        <item name="colorGradient1Color1">@color/colorSunset1</item>
+        <item name="colorGradient1Color2">@color/colorSunset2</item>
+        <item name="colorGradient2Color1">@color/colorDusk1</item>
+        <item name="colorGradient2Color2">@color/colorDusk2</item>
+
+        <item name="colorProgressAccent">@color/colorDarkGrey</item>
+
+        <item name="colorButtonPrimary">@color/colorMidnightBlack</item>
+
+    </style>
+
+    <style name="Theme.App.Evening">
+
+        <item name="colorPrimary">@color/colorDusk1</item>
+        <item name="colorPrimaryDark">@color/colorDusk2</item>
+        <item name="colorAccent">@color/colorBlueA700</item>
+
+        <item name="colorGradient1Color1">@color/colorDawn1</item>
+        <item name="colorGradient1Color2">@color/colorDawn2</item>
+        <item name="colorGradient2Color1">@color/colorSunrise1</item>
+        <item name="colorGradient2Color2">@color/colorSunrise2</item>
+
+        <item name="colorProgressAccent">@android:color/white</item>
+
+        <item name="colorButtonPrimary">@color/colorMidnightBlack</item>
+
+    </style>
+
+
+
+
+    <style name="Widget" />
+
+    <style name="Widget.App" />
+
+    <style name="Widget.App.ProgressBar">
+        <item name="android:progressDrawable">@drawable/circular_progress_bar</item>
+        <item name="android:thicknessRatio">0.1</item>
+    </style>
+
+    <style name="Widget.App.TableCard">
+        <item name="android:background">@drawable/table_rectangle</item>
+        <item name="android:paddingStart">50dp</item>
+        <item name="android:paddingTop">20dp</item>
+        <item name="android:paddingEnd">50dp</item>
+        <item name="android:paddingBottom">20dp</item>
+        <item name="android:stretchColumns">0</item>
+    </style>
+
+
+    <style name="Widget.App.Dialog">
+
+    </style>
+
+    <style name="Widget.App.Dialog.InputTextFieldLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.EditText</item>
+        <item name="boxStrokeWidth">0.75dp</item>
+        <item name="boxStrokeColor">#333333</item>
+    </style>
+
+    <style name="Widget.App.Dialog.EditText">
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+
+
+    <style name="Widget.App.Dialog.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">#333333</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <style name="Widget.App.Dialog.Button.Secondary" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">#333333</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+
+    <style name="Widget.App.InputField">
+
+    </style>
+
+
+    <style name="Widget.App.InputField.Layout">
+        <item name="android:background">@drawable/rounded_rectangle_4dp</item>
+        <item name="android:backgroundTint">#f1f1f1</item>
+        <item name="android:paddingTop">4dp</item>
+    </style>
+
+    <style name="Widget.App.InputField.Label">
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body2</item>
+    </style>
+
+    <style name="Widget.App.InputField.Input" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:backgroundTint">#707070</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+    </style>
+
+    <style name="Widget.App.Button" />
+
+    <style name="Widget.App.Button.Primary">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@drawable/button_stadium</item>
+        <item name="backgroundTint">?attr/colorButtonPrimary</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+
+
+    <style name="ThemeOverlay" />
+    <style name="ThemeOverlay.App" />
+
+    <style name="ThemeOverlay.App.EditText" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textSize">15sp</item>
+        <item name="colorPrimary">#333333</item>
+        <item name="colorOnSurface">#99333333</item>
+    </style>
+
+
+
+    <style name="TextAppearance" />
+
+    <style name="TextAppearance.App">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="TextAppearance.App.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:letterSpacing">0.016</item>
+    </style>
+
+    <style name="TextAppearance.App.CountdownTime">
+        <item name="android:fontFamily">@font/open_sans_light</item>
+        <item name="android:textSize">59dp</item>
+        <item name="android:letterSpacing">0.016</item>
+    </style>
+
+    <style name="TextAppearance.App.CountdownTime.Small">
+        <item name="android:textSize">49dp</item>
+    </style>
+
+    <style name="TextAppearance.App.CountdownTime.Large">
+        <item name="android:textSize">69dp</item>
+    </style>
+
+    <style name="TextAppearance.App.CountdownLabel">
+        <item name="android:fontFamily">@font/roboto_light</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:letterSpacing">0.027</item>
+    </style>
+
+    <style name="TextAppearance.App.Location">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">17dp</item>
+        <item name="android:letterSpacing">0.027</item>
+    </style>
+
+    <style name="TextAppearance.App.CountdownSeconds">
+        <item name="android:fontFamily">@font/open_sans</item>
+        <item name="android:textSize">23dp</item>
+        <item name="android:letterSpacing">0.016</item>
+    </style>
+
+    <style name="TextAppearance.App.TableLabel">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.016</item>
+    </style>
+
+    <style name="TextAppearance.App.TableValue">
+        <item name="android:fontFamily">@font/roboto_light</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:letterSpacing">0.016</item>
+    </style>
+
+    <style name="TextAppearance.App.Heading">
+        <item name="android:fontFamily">@font/roboto_light</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:letterSpacing">0.008</item>
+    </style>
+
+</resources>
