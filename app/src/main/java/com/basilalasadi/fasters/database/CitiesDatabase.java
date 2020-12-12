@@ -7,8 +7,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
+import android.os.SystemClock;
 import android.util.Log;
 
+import com.basilalasadi.fasters.MyApplication;
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.provider.PreferencesManager;
 import com.basilalasadi.fasters.util.BinaryReader;
@@ -39,21 +42,26 @@ public class CitiesDatabase {
 		
 		if (version < 1) {
 			context.deleteDatabase("worldcities.db");
+			createAndPopulateDatabase(context);
+			database.close();
+		}
+		
+		try {
+			database = SQLiteDatabase.openDatabase(context.getDatabasePath("worldcities.db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+		}
+		catch (SQLiteException e) {
+			context.deleteDatabase("worldcities.db");
+			createAndPopulateDatabase(context);
+			database.close();
 			
-			createDatabase(context);
-			populateDatabase(context);
+			database = SQLiteDatabase.openDatabase(context.getDatabasePath("worldcities.db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
 		}
-		else {
-			try {
-				database = SQLiteDatabase.openDatabase(context.getDatabasePath("worldcities.db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
-			}
-			catch (SQLiteException e) {
-				context.deleteDatabase("worldcities.db");
-				
-				createDatabase(context);
-				populateDatabase(context);
-			}
-		}
+	}
+	
+	private void createAndPopulateDatabase(Context context) throws IOException {
+		createDatabase(context);
+		populateDatabase(context);
+		createDatabaseIndexes();
 	}
 	
 	private void createDatabase(Context context) {
@@ -72,50 +80,72 @@ public class CitiesDatabase {
 						"latitude REAL NOT NULL" +
 					")"
 			);
-			
-			database.execSQL("CREATE INDEX idx__country ON cities(country)");
-			database.execSQL("CREATE INDEX idx__country_admin_city ON cities(country, admin, city)");
-			
-			Cursor cursor = database.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-			
-			while (cursor.moveToNext()) {
-				Log.d("CitiesDatabase", "table " + cursor.getString(0));
-			}
-			
-			cursor.close();
 		}
+	}
+	
+	private void createDatabaseIndexes() {
+		database.execSQL("CREATE INDEX idx__country ON cities(country)");
+		database.execSQL("CREATE INDEX idx__country_admin_city ON cities(country, admin, city)");
 	}
 	
 	private void populateDatabase(Context context) throws IOException {
 		synchronized (mutex) {
+			
+			long overallT = SystemClock.elapsedRealtimeNanos();
+			
 			database.beginTransaction();
+			
+			long totalReadTime = 0;
+			long totalWriteTime = 0;
 			
 			try (InputStream fin = new BinaryAsset(context, "worldcities").open()) {
 				
 				BinaryReader reader = new BinaryReader(fin);
 				
+				SQLiteStatement statement = database.compileStatement(
+						"INSERT INTO cities(country, admin, city, longitude, latitude) VALUES (?,?,?,?,?)");
+				
 				//noinspection InfiniteLoopStatement
 				while (true) {
+					long t;
+					
+					t = SystemClock.elapsedRealtimeNanos();
+					
 					String country = reader.readString();
 					String admin = reader.readString();
 					String city = reader.readString();
 					double longitude = reader.readDouble();
 					double latitude = reader.readDouble();
 					
-					ContentValues values = new ContentValues();
+					totalReadTime += SystemClock.elapsedRealtimeNanos() - t;
 					
-					values.put("country", country);
-					values.put("admin", admin);
-					values.put("city", city);
-					values.put("longitude", longitude);
-					values.put("latitude", latitude);
 					
-					database.insert("cities", null, values);
+					t = SystemClock.elapsedRealtimeNanos();
+					
+					statement.bindString(1, country);
+					statement.bindString(2, admin);
+					statement.bindString(3, city);
+					statement.bindDouble(4, longitude);
+					statement.bindDouble(5, latitude);
+					
+					statement.executeInsert();
+					
+					totalWriteTime += SystemClock.elapsedRealtimeNanos() - t;
 				}
 			}
-			catch (EOFException ignored) {}
+			catch (EOFException ignored) {
+				database.setTransactionSuccessful();
+			}
+			finally {
+				database.endTransaction();
+			}
 			
-			database.endTransaction();
+			
+			overallT = SystemClock.elapsedRealtimeNanos() - overallT;
+			
+			Log.d("CitiesDatabase", "Total read time is " + (totalReadTime / 1000000000d) + " s.");
+			Log.d("CitiesDatabase", "Total write time is " + (totalWriteTime / 1000000000d) + " s.");
+			Log.d("CitiesDatabase", "Done populating database in " + (overallT / 1000000000d) + " s.");
 		}
 	}
 	

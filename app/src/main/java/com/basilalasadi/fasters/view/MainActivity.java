@@ -19,9 +19,12 @@ import android.widget.ScrollView;
 
 import com.basilalasadi.fasters.BuildConfig;
 import com.basilalasadi.fasters.R;
+import com.basilalasadi.fasters.database.CitiesDatabase;
 import com.basilalasadi.fasters.view.AppTheme;
 import com.basilalasadi.fasters.view.LocationFragment;
 import com.basilalasadi.fasters.view.ScrollingGradientBackground;
+
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -101,16 +104,18 @@ public class MainActivity extends AppCompatActivity {
 		
 		
 		buttonShowLocationDialog.setOnClickListener((View v) -> {
-//			FragmentManager fragmentManager = getSupportFragmentManager();
-//			DialogFragment dialog = LocationFragment.newInstance();
-//
-//			dialog.setCancelable(true);
-//
-//			dialog.show(fragmentManager, LocationFragment.TAG);
-			
 			Intent intent = new Intent(this, SetLocationActivity.class);
 			
 			startActivity(intent);
+		});
+		
+		findViewById(R.id.buttonExecuteDebugFunction).setOnClickListener((v) -> {
+			try {
+				CitiesDatabase.getInstance(this);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
 	}
 	
