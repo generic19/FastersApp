@@ -24,11 +24,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class AssetDatabase {
+	protected final Context context;
 	protected final String name;
 	protected final String assetPath;
 	protected final boolean isCompressed;
 
 	public AssetDatabase(Context context, String name) throws IOException {
+		this.context = context;
 		this.name = name;
 		
 		final AssetManager assets = context.getAssets();
@@ -47,12 +49,16 @@ public class AssetDatabase {
 		isCompressed = pathResult.isCompressed;
 	}
 	
-	public boolean databaseExists(Context context) {
-		 return context.getDatabasePath(name).isFile();
+	public File databasePath() {
+		return context.getDatabasePath(name + ".db");
 	}
 	
-	protected void unpack(Context context) throws IOException {
-		File databasePath = context.getDatabasePath(name);
+	public boolean databaseExists() {
+		 return databasePath().isFile();
+	}
+	
+	protected void unpack() throws IOException {
+		File databasePath = context.getDatabasePath(name + ".db");
 		final AssetManager assets = context.getAssets();
 		
 		InputStream inputStream = null;
@@ -83,16 +89,16 @@ public class AssetDatabase {
 					}
 				}
 				
-				if (!validPosition) throw new IllegalArgumentException("Found zip archive does not contain a valid entry.");
+				if (!validPosition) throw new IllegalArgumentException("Zip archive does not contain a valid entry.");
 				
 				inputStream = zipInputStream;
 			} else {
 				inputStream = assets.open(assetPath);
 			}
 			
-			Log.d("AssetDatabase", "database path " + databasePath + ".db");
+			Log.d("AssetDatabase", "database path " + databasePath);
 			
-			outputStream = new FileOutputStream(databasePath + ".db");
+			outputStream = new FileOutputStream(databasePath);
 			
 			byte[] buffer = new byte[1024];
 			
@@ -118,12 +124,12 @@ public class AssetDatabase {
 		}
 	}
 	
-	public SQLiteDatabase openDatabase(Context context) throws IOException {
-		if (!databaseExists(context)) {
-			unpack(context);
+	public SQLiteDatabase openDatabase() throws IOException {
+		if (!databaseExists()) {
+			unpack();
 		}
 		
-		return SQLiteDatabase.openDatabase(name + ".db", null, SQLiteDatabase.OPEN_READONLY);
+		return SQLiteDatabase.openDatabase(databasePath().getPath(), null, SQLiteDatabase.OPEN_READONLY);
 	}
 	
 	

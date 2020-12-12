@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class CitiesDatabase {
+public final class CitiesDatabase {
+	private static final String DATABASE_NAME = "worldcities";
+	
 	private static CitiesDatabase instance;
 	
 	private SQLiteDatabase database;
@@ -38,115 +40,32 @@ public class CitiesDatabase {
 	private CitiesDatabase(Context context) throws IOException {
 		SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
 		
-		int version = PreferencesManager.getDatabaseVersion(prefs, "worldcities");
+		int version = PreferencesManager.getDatabaseVersion(prefs, DATABASE_NAME);
 		
 		if (version < 1) {
-			context.deleteDatabase("worldcities.db");
-			createAndPopulateDatabase(context);
-			database.close();
+			context.deleteDatabase(DATABASE_NAME + ".db");
+			copyDatabaseFromAssets(context);
+		}
+		else {
+			try {
+				database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+			}
+			catch (SQLiteException e) {
+				context.deleteDatabase(DATABASE_NAME + ".db");
+				copyDatabaseFromAssets(context);
+				
+				database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+			}
 		}
 		
-		try {
-			database = SQLiteDatabase.openDatabase(context.getDatabasePath("worldcities.db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
-		}
-		catch (SQLiteException e) {
-			context.deleteDatabase("worldcities.db");
-			createAndPopulateDatabase(context);
-			database.close();
-			
-			database = SQLiteDatabase.openDatabase(context.getDatabasePath("worldcities.db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
-		}
 	}
 	
-	private void createAndPopulateDatabase(Context context) throws IOException {
-		createDatabase(context);
-		populateDatabase(context);
-		createDatabaseIndexes();
-	}
-	
-	private void createDatabase(Context context) {
-		synchronized (mutex) {
-			database = SQLiteDatabase.openOrCreateDatabase(context.getDatabasePath("worldcities.db"), null);
-			
-			Log.d("CitiesDatabase", "creating database in " + context.getDatabasePath("worldcities.db"));
-			
-			
-			database.execSQL(
-					"CREATE TABLE cities(" +
-						"country TEXT NOT NULL, " +
-						"admin TEXT NOT NULL, " +
-						"city TEXT NOT NULL, " +
-						"longitude REAL NOT NULL, " +
-						"latitude REAL NOT NULL" +
-					")"
-			);
-		}
-	}
-	
-	private void createDatabaseIndexes() {
-		database.execSQL("CREATE INDEX idx__country ON cities(country)");
-		database.execSQL("CREATE INDEX idx__country_admin_city ON cities(country, admin, city)");
-	}
-	
-	private void populateDatabase(Context context) throws IOException {
-		synchronized (mutex) {
-			
-			long overallT = SystemClock.elapsedRealtimeNanos();
-			
-			database.beginTransaction();
-			
-			long totalReadTime = 0;
-			long totalWriteTime = 0;
-			
-			try (InputStream fin = new BinaryAsset(context, "worldcities").open()) {
-				
-				BinaryReader reader = new BinaryReader(fin);
-				
-				SQLiteStatement statement = database.compileStatement(
-						"INSERT INTO cities(country, admin, city, longitude, latitude) VALUES (?,?,?,?,?)");
-				
-				//noinspection InfiniteLoopStatement
-				while (true) {
-					long t;
-					
-					t = SystemClock.elapsedRealtimeNanos();
-					
-					String country = reader.readString();
-					String admin = reader.readString();
-					String city = reader.readString();
-					double longitude = reader.readDouble();
-					double latitude = reader.readDouble();
-					
-					totalReadTime += SystemClock.elapsedRealtimeNanos() - t;
-					
-					
-					t = SystemClock.elapsedRealtimeNanos();
-					
-					statement.bindString(1, country);
-					statement.bindString(2, admin);
-					statement.bindString(3, city);
-					statement.bindDouble(4, longitude);
-					statement.bindDouble(5, latitude);
-					
-					statement.executeInsert();
-					
-					totalWriteTime += SystemClock.elapsedRealtimeNanos() - t;
-				}
-			}
-			catch (EOFException ignored) {
-				database.setTransactionSuccessful();
-			}
-			finally {
-				database.endTransaction();
-			}
-			
-			
-			overallT = SystemClock.elapsedRealtimeNanos() - overallT;
-			
-			Log.d("CitiesDatabase", "Total read time is " + (totalReadTime / 1000000000d) + " s.");
-			Log.d("CitiesDatabase", "Total write time is " + (totalWriteTime / 1000000000d) + " s.");
-			Log.d("CitiesDatabase", "Done populating database in " + (overallT / 1000000000d) + " s.");
-		}
+	private void copyDatabaseFromAssets(Context context) throws IOException {
+		long t = SystemClock.elapsedRealtimeNanos();
+		database = new AssetDatabase(context, DATABASE_NAME).openDatabase();
+		t = SystemClock.elapsedRealtimeNanos() - t;
+		
+		Log.d("CitiesDatabase", "copied database in " + (t / 1000000000d) + " s.");
 	}
 	
 	@Override
