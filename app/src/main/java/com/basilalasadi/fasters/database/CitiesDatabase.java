@@ -13,9 +13,7 @@ import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.provider.PreferencesManager;
 import com.basilalasadi.fasters.util.BinaryReader;
 
-import java.io.BufferedInputStream;
 import java.io.EOFException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -58,7 +56,7 @@ public class CitiesDatabase {
 		}
 	}
 	
-	private void createDatabase(Context context) throws IOException {
+	private void createDatabase(Context context) {
 		synchronized (mutex) {
 			database = SQLiteDatabase.openOrCreateDatabase(context.getDatabasePath("worldcities.db"), null);
 			
@@ -90,11 +88,13 @@ public class CitiesDatabase {
 	
 	private void populateDatabase(Context context) throws IOException {
 		synchronized (mutex) {
+			database.beginTransaction();
+			
 			try (InputStream fin = new BinaryAsset(context, "worldcities").open()) {
-				database.beginTransaction();
 				
 				BinaryReader reader = new BinaryReader(fin);
 				
+				//noinspection InfiniteLoopStatement
 				while (true) {
 					String country = reader.readString();
 					String admin = reader.readString();
@@ -130,113 +130,99 @@ public class CitiesDatabase {
 	}
 	
 	public String[] getCountries() {
-		Cursor cursor = database.query(
-				true, "cities",
-				new String[]{"country"},
-				null, null, null, null,
-				"country",
-				null);
-		
-		int colCountry = cursor.getColumnIndexOrThrow("country");
-		
-		ArrayList<String> countries = new ArrayList<>(250);
-		
-		while (cursor.moveToNext()) {
-			countries.add(cursor.getString(colCountry));
+		synchronized (mutex) {
+			Cursor cursor = database.query(true, "cities", new String[]{"country"}, null, null, null, null, "country", null);
+			
+			int colCountry = cursor.getColumnIndexOrThrow("country");
+			
+			ArrayList<String> countries = new ArrayList<>(250);
+			
+			while (cursor.moveToNext()) {
+				countries.add(cursor.getString(colCountry));
+			}
+			
+			cursor.close();
+			return countries.toArray(new String[0]);
 		}
 		
-		cursor.close();
-		
-		return countries.toArray(new String[0]);
 	}
 	
 	public AdminCity[] getCountryAdminCities(String country) {
-		Cursor cursor = database.query(
-				"cities",
-				new String[]{"admin", "city"},
-				"country == ?",
-				new String[]{country},
-				null, null, "admin, city", null);
-		
-		int colAdmin = cursor.getColumnIndexOrThrow("admin");
-		int colCity = cursor.getColumnIndexOrThrow("city");
-		
-		ArrayList<AdminCity> adminCities = new ArrayList<>();
-		
-		while (cursor.moveToNext()) {
-			String admin = cursor.getString(colAdmin);
-			String city = cursor.getString(colCity);
+		synchronized (mutex) {
+			Cursor cursor = database.query("cities", new String[]{"admin", "city"}, "country == ?", new String[]{country}, null, null, "admin, city", null);
 			
-			adminCities.add(new AdminCity(admin, city));
+			int colAdmin = cursor.getColumnIndexOrThrow("admin");
+			int colCity = cursor.getColumnIndexOrThrow("city");
+			
+			ArrayList<AdminCity> adminCities = new ArrayList<>();
+			
+			while (cursor.moveToNext()) {
+				String admin = cursor.getString(colAdmin);
+				String city = cursor.getString(colCity);
+				
+				adminCities.add(new AdminCity(admin, city));
+			}
+			
+			cursor.close();
+			return adminCities.toArray(new AdminCity[0]);
 		}
-		
-		cursor.close();
-		
-		return adminCities.toArray(new AdminCity[0]);
 	}
 	
 	public CityLocation getAdminCityLocation(String country, String admin, String city) {
-		Cursor cursor = database.query(
-				"Cities",
-				new String[]{"longitude", "latitude"},
-				"country == ? AND admin == ? AND city == ?",
-				new String[]{country, admin, city},
-				null, null, null, "1");
-		
-		if (!cursor.moveToFirst()) {
-			cursor.close();
-			return null;
-		}
-		else {
-			int colLongitude = cursor.getColumnIndexOrThrow("longitude");
-			int colLatitude = cursor.getColumnIndexOrThrow("latitude");
+		synchronized (mutex) {
+			Cursor cursor = database.query("Cities", new String[]{"longitude", "latitude"}, "country == ? AND admin == ? AND city == ?", new String[]{country, admin, city}, null, null, null, "1");
 			
-			double longitude = cursor.getDouble(colLongitude);
-			double latitude = cursor.getDouble(colLatitude);
-			
-			cursor.close();
-			return new CityLocation(longitude, latitude);
+			if (!cursor.moveToFirst()) {
+				cursor.close();
+				return null;
+			} else {
+				int colLongitude = cursor.getColumnIndexOrThrow("longitude");
+				int colLatitude = cursor.getColumnIndexOrThrow("latitude");
+				
+				double longitude = cursor.getDouble(colLongitude);
+				double latitude = cursor.getDouble(colLatitude);
+				
+				cursor.close();
+				return new CityLocation(longitude, latitude);
+			}
 		}
 	}
 	
 	public CountryAdminCity findClosestCountryAdminCity(double longitude, double latitude) {
-		final double tolerance = 2;
-		
-		@SuppressLint("DefaultLocale")
-		final String orderBy = String.format(
-				"(longitude - %1$f) * (longitude - %1$f) + (latitude - %2$f) * (latitude - %2$f)",
-				longitude, latitude);
-		
-		Cursor cursor = database.query(
-				"cities",
-				new String[]{"country", "admin", "city"},
-				"longitude BETWEEN ? AND ? AND latitude BETWEEN ? AND ?",
-				new String[]{
-						String.valueOf(longitude - tolerance),
-						String.valueOf(longitude + tolerance),
-						String.valueOf(latitude - tolerance),
-						String.valueOf(latitude + tolerance)
-				},
-				null, null,
-				orderBy,
-				"1");
-		
-		if (!cursor.moveToFirst()) {
-			cursor.close();
-			return null;
-		}
-		else {
-			int colCountry = cursor.getColumnIndexOrThrow("country");
-			int colAdmin = cursor.getColumnIndexOrThrow("admin");
-			int colCity = cursor.getColumnIndexOrThrow("city");
+		synchronized (mutex) {
+			final double tolerance = 2;
 			
-			CountryAdminCity result = new CountryAdminCity(
-					cursor.getString(colCountry),
-					cursor.getString(colAdmin),
-					cursor.getString(colCity));
+			@SuppressLint("DefaultLocale") final String orderBy = String.format(
+					"(longitude - %1$f) * (longitude - %1$f) + (latitude - %2$f) * (latitude - %2$f)",
+					longitude, latitude);
 			
-			cursor.close();
-			return result;
+			Cursor cursor = database.query("cities",
+					new String[]{"country", "admin", "city"},
+					"longitude BETWEEN ? AND ? AND latitude BETWEEN ? AND ?",
+					new String[]{
+							String.valueOf(longitude - tolerance),
+							String.valueOf(longitude + tolerance),
+							String.valueOf(latitude - tolerance),
+							String.valueOf(latitude + tolerance)
+					},
+					null,
+					null,
+					orderBy,
+					"1");
+			
+			if (!cursor.moveToFirst()) {
+				cursor.close();
+				return null;
+			} else {
+				int colCountry = cursor.getColumnIndexOrThrow("country");
+				int colAdmin = cursor.getColumnIndexOrThrow("admin");
+				int colCity = cursor.getColumnIndexOrThrow("city");
+				
+				CountryAdminCity result = new CountryAdminCity(cursor.getString(colCountry), cursor.getString(colAdmin), cursor.getString(colCity));
+				
+				cursor.close();
+				return result;
+			}
 		}
 	}
 	
