@@ -25,13 +25,7 @@ public class MyApplication extends Application {
 		super.onCreate();
 		instance = this;
 		
-		//TODO Uncomment this
-//		try {
-//			CitiesDatabase.getInstance(this);
-//		}
-//		catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		CitiesDatabase.getInstance(this);
 	}
 	
 	public static MyApplication getInstance() {

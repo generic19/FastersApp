@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.basilalasadi.fasters.BuildConfig;
 import com.basilalasadi.fasters.R;
@@ -110,12 +111,7 @@ public class MainActivity extends AppCompatActivity {
 		});
 		
 		findViewById(R.id.buttonExecuteDebugFunction).setOnClickListener((v) -> {
-			try {
-				CitiesDatabase.getInstance(this);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
+			Toast.makeText(this, "Add code to run.", Toast.LENGTH_SHORT).show();
 		});
 	}
 	

@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.basilalasadi.fasters.MyApplication;
 import com.basilalasadi.fasters.R;
+import com.basilalasadi.fasters.executors.AppExecutors;
 import com.basilalasadi.fasters.provider.PreferencesManager;
 import com.basilalasadi.fasters.util.BinaryReader;
 
@@ -30,51 +31,66 @@ public final class CitiesDatabase {
 	
 	protected final Object mutex = new Object();
 	
-	public static synchronized CitiesDatabase getInstance(Context context) throws IOException {
+	public static synchronized CitiesDatabase getInstance(Context context) {
 		if (instance == null) {
 			instance = new CitiesDatabase(context);
 		}
 		return instance;
 	}
 	
-	private CitiesDatabase(Context context) throws IOException {
-		SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
-		
-		int version = PreferencesManager.getDatabaseVersion(prefs, DATABASE_NAME);
-		
-		if (version < 1) {
-			context.deleteDatabase(DATABASE_NAME + ".db");
-			copyDatabaseFromAssets(context);
-		}
-		else {
+	private CitiesDatabase(Context context) {
+		AppExecutors.ioExecutor.submit(() -> {
 			try {
-				database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+				initializeDatabase(context);
 			}
-			catch (SQLiteException e) {
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+	
+	private void initializeDatabase(Context context) throws IOException {
+		synchronized (mutex) {
+			SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+			
+			int version = PreferencesManager.getDatabaseVersion(prefs, DATABASE_NAME);
+			
+			if (version < 1) {
 				context.deleteDatabase(DATABASE_NAME + ".db");
 				copyDatabaseFromAssets(context);
-				
-				database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+			}
+			else {
+				try {
+					database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+				}
+				catch (SQLiteException e) {
+					context.deleteDatabase(DATABASE_NAME + ".db");
+					copyDatabaseFromAssets(context);
+					
+					database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+				}
 			}
 		}
-		
 	}
 	
 	private void copyDatabaseFromAssets(Context context) throws IOException {
-		long t = SystemClock.elapsedRealtimeNanos();
-		database = new AssetDatabase(context, DATABASE_NAME).openDatabase();
-		t = SystemClock.elapsedRealtimeNanos() - t;
-		
-		Log.d("CitiesDatabase", "copied database in " + (t / 1000000000d) + " s.");
+		synchronized (mutex) {
+			long t = SystemClock.elapsedRealtimeNanos();
+			database = new AssetDatabase(context, DATABASE_NAME).openDatabase();
+			t = SystemClock.elapsedRealtimeNanos() - t;
+			
+			Log.d("CitiesDatabase", "copied database in " + (t / 1000000000d) + " s.");
+		}
 	}
 	
 	@Override
 	protected synchronized void finalize() throws Throwable {
-		if (database != null) {
-			database.close();
-			database = null;
+		synchronized (mutex) {
+			if (database != null) {
+				database.close();
+				database = null;
+			}
 		}
-		
 		super.finalize();
 	}
 	

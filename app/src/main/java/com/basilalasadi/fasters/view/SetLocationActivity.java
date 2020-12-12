@@ -53,14 +53,7 @@ public class SetLocationActivity extends AppCompatActivity {
 		
 		setAppTheme(appTheme);
 		
-		try {
-			citiesDatabase = CitiesDatabase.getInstance(this);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			finish();
-			return;
-		}
+		citiesDatabase = CitiesDatabase.getInstance(this);
 		
 		countriesAdapter = new ArrayAdapterWithFuzzyFilter<>(this, android.R.layout.simple_dropdown_item_1line);
 		citiesAdapter = new ArrayAdapterWithFuzzyFilter<>(this, android.R.layout.simple_dropdown_item_1line);
