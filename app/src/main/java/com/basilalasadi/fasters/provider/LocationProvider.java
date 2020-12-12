@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import com.basilalasadi.fasters.executors.AppExecutors;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -28,8 +30,6 @@ public abstract class LocationProvider {
 	public interface OnLocationResultCallback {
 		void onLocationResult(LocationResult result);
 	}
-	
-	protected static final ExecutorService multithreadedExecutor = Executors.newCachedThreadPool();
 	
 	private static final PermissionsActivity permissionsActivity = new PermissionsActivity();
 	
@@ -125,7 +125,7 @@ public abstract class LocationProvider {
 	 * @return Future to location result.
 	 */
 	public static Future<LocationResult> getLocationAsync() {
-		return multithreadedExecutor.submit((Callable<LocationResult>) LocationProvider::getLocation);
+		return AppExecutors.ioExecutor.submit((Callable<LocationResult>) LocationProvider::getLocation);
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public abstract class LocationProvider {
 	 * @return Future to location result.
 	 */
 	public static Future<LocationResult> getLocationAsync(boolean includeAddress) {
-		return multithreadedExecutor.submit(() -> getLocation(includeAddress));
+		return AppExecutors.ioExecutor.submit(() -> getLocation(includeAddress));
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public abstract class LocationProvider {
 	 * @param callback The callback to call when location result is available.
 	 */
 	public static void getLocationAsync(OnLocationResultCallback callback) {
-		multithreadedExecutor.submit(() -> callback.onLocationResult(getLocation()));
+		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(getLocation()));
 	}
 	
 	/**
@@ -152,7 +152,7 @@ public abstract class LocationProvider {
 	 * @param callback The callback to call when location result is available.
 	 */
 	public static void getLocationAsync(OnLocationResultCallback callback, boolean includeAddress) {
-		multithreadedExecutor.submit(() -> callback.onLocationResult(getLocation(includeAddress)));
+		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(getLocation(includeAddress)));
 	}
 	
 	protected static String geoLocationToAddress(Location geoLocation) throws IOException {
@@ -189,11 +189,11 @@ public abstract class LocationProvider {
 	}
 	
 	public static Future<LocationResult> locationFromAddressAsync(String addressString) {
-		return multithreadedExecutor.submit(() -> locationFromAddress(addressString));
+		return AppExecutors.ioExecutor.submit(() -> locationFromAddress(addressString));
 	}
 	
 	public static void locationFromAddressAsync(String addressString, OnLocationResultCallback callback) {
-		multithreadedExecutor.submit(() -> callback.onLocationResult(locationFromAddress(addressString)));
+		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(locationFromAddress(addressString)));
 	}
 	
 	protected static boolean ensureLocationPermission() throws ExecutionException, InterruptedException {
