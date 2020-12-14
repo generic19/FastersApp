@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
 		
 		buttonShowLocationDialog.setOnClickListener((View v) -> {
 			Intent intent = new Intent(this, SetLocationActivity.class);
-			
 			startActivity(intent);
 		});
 		

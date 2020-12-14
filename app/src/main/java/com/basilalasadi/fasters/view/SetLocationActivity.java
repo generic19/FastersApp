@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.database.CitiesDatabase;
@@ -18,10 +17,11 @@ import com.basilalasadi.fasters.model.LocationViewModel;
 import com.basilalasadi.fasters.provider.PreferencesManager;
 import com.basilalasadi.fasters.provider.LocationProvider;
 import com.basilalasadi.fasters.util.ArrayAdapterWithFuzzyFilter;
+import com.basilalasadi.fasters.util.PermissionsActivity;
+import com.google.android.material.appbar.MaterialToolbar;
 
-import java.io.IOException;
 
-public class SetLocationActivity extends AppCompatActivity {
+public class SetLocationActivity extends PermissionsActivity {
 	SharedPreferences prefs;
 	CitiesDatabase citiesDatabase;
 	
@@ -114,10 +114,16 @@ public class SetLocationActivity extends AppCompatActivity {
 	}
 	
 	private void addListeners() {
+		MaterialToolbar appBar = findViewById(R.id.appBar);
 		Button buttonLocate = findViewById(R.id.buttonLocate);
 		Button buttonSetLocation = findViewById(R.id.buttonSetLocation);
 		AutoCompleteTextView actvCountry = findViewById(R.id.autoCompleteTextViewCountry);
 		AutoCompleteTextView actvCity = findViewById(R.id.autoCompleteTextViewCity);
+		
+		
+		appBar.setNavigationOnClickListener((v) -> {
+			finish();
+		});
 		
 		
 		buttonLocate.setOnClickListener((v) -> {
@@ -170,7 +176,7 @@ public class SetLocationActivity extends AppCompatActivity {
 	
 	
 	private String fetchLocation() {
-		LocationProvider.LocationResult locationResult = LocationProvider.getLocation();
+		LocationProvider.LocationResult locationResult = LocationProvider.getLocation(this);
 		
 		if (locationResult.isError()) {
 			switch (locationResult.getError()) {
