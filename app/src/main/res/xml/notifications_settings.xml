@@ -1,0 +1,57 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        app:key="all_notifications"
+        android:layout="@layout/preference_card"
+        app:title="Notifications"
+        app:defaultValue="true"
+        app:allowDividerBelow="false"/>
+
+    <PreferenceCategory
+        app:key="reminders"
+        app:title="Reminders"
+        android:layout="@layout/app_preference_category">
+
+        <SwitchPreference
+            app:key="prefast_meal_reminder"
+            android:layout="@layout/preference_card"
+            app:title="Pre-fast Meal Reminder"
+            app:defaultValue="true"
+            android:summary="Reminds you to eat 1 hour before fasting time." />
+
+        <SwitchPreference
+            app:key="water_reminder"
+            android:layout="@layout/preference_card"
+            app:title="Water Reminder"
+            app:defaultValue="true"
+            android:summary="Reminds you to drink water 15 minutes before fasting time." />
+
+        <SwitchPreference
+            app:key="prepare_breakfast_reminder"
+            android:layout="@layout/preference_card"
+            app:title="Prepare Breakfast Reminder"
+            android:summary="Reminds you to prepare a meal 2 hours before breakfast time." />
+
+        <SwitchPreference
+            app:key="breakfast_near_reminder"
+            android:layout="@layout/preference_card"
+            app:title="Breakfast Reminder"
+            app:allowDividerBelow="false"
+            android:summary="Reminds you to prepare to eat 15 minutes before breakfast time." />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="app_settings"
+        app:title="App Settings"
+        android:layout="@layout/app_preference_category">
+
+        <Preference
+            app:key="app_notifications"
+            app:title="App Notifications"
+            android:layout="@layout/preference_card" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

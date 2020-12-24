@@ -2,13 +2,9 @@ package com.basilalasadi.fasters.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -20,12 +16,7 @@ import android.widget.Toast;
 
 import com.basilalasadi.fasters.BuildConfig;
 import com.basilalasadi.fasters.R;
-import com.basilalasadi.fasters.database.CitiesDatabase;
-import com.basilalasadi.fasters.view.AppTheme;
-import com.basilalasadi.fasters.view.LocationFragment;
-import com.basilalasadi.fasters.view.ScrollingGradientBackground;
-
-import java.io.IOException;
+import com.basilalasadi.fasters.view.settings.SettingsActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		adjustViewsBasedOnTheme(appTheme);
+		adjustViewsBasedOnTheme();
 		
 		addListeners();
 	}
@@ -55,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
 		final View root = findViewById(isLandscape? R.id.constraintLayoutRoot : R.id.scrollViewRoot);
 		final ScrollView scrollView = findViewById(isLandscape? R.id.scrollViewInfo : R.id.scrollViewRoot);
 		
-		final Button buttonSwitchTheme = (Button) findViewById(R.id.buttonDebugSwitchTheme);
-		final Button buttonShowLocationDialog = (Button) findViewById(R.id.buttonDebugShowLocationDialog);
+		final Button buttonLaunchSettingsActivity = findViewById(R.id.buttonDebugShowLocationDialog);
 		
 		/*
 		 * Pre-draw listener. Executes once, then removes itself.
@@ -83,35 +73,38 @@ public class MainActivity extends AppCompatActivity {
 		 * "Switch Theme" button on-click listener. Switches AppTheme in shared preferences and
 		 * recreates this activity.
 		 */
-		buttonSwitchTheme.setOnClickListener((View v) -> {
+		findViewById(R.id.tableLayoutQuickInfo).setOnClickListener((View v) -> {
 			SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_preferences_name), 0);
-			int appThemeIndex = prefs.getInt("app_theme", AppTheme.Morning.ordinal());
+			
+			int appTheme = prefs.getInt("app_theme", AppTheme.THEME_MORNING);
 			
 			SharedPreferences.Editor editor = prefs.edit();
 			
 			try {
-				if (appThemeIndex == AppTheme.Morning.ordinal()) {
-					editor.putInt("app_theme", AppTheme.Evening.ordinal());
-				} else {
-					editor.putInt("app_theme", AppTheme.Morning.ordinal());
+				if (appTheme == AppTheme.THEME_MORNING) {
+					editor.putInt("app_theme", AppTheme.THEME_EVENING);
+				}
+				else {
+					editor.putInt("app_theme", AppTheme.THEME_MORNING);
 				}
 			}
 			finally {
 				editor.apply();
 			}
 			
+			getWindow().setWindowAnimations(R.style.Window_Transition_ThemeSwitch);
+			
 			recreate();
 		});
 		
 		
-		buttonShowLocationDialog.setOnClickListener((View v) -> {
-			Intent intent = new Intent(this, SetLocationActivity.class);
+		buttonLaunchSettingsActivity.setOnClickListener((View v) -> {
+			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 		});
 		
-		findViewById(R.id.buttonExecuteDebugFunction).setOnClickListener((v) -> {
-			Toast.makeText(this, "Add code to run.", Toast.LENGTH_SHORT).show();
-		});
+		findViewById(R.id.buttonExecuteDebugFunction).setOnClickListener(
+				view -> Toast.makeText(this, "No code to run.", Toast.LENGTH_SHORT).show());
 	}
 	
 	/**
@@ -134,9 +127,8 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * Modifies the attributes of this activity's views based on `appTheme`.
 	 *
-	 * @param appTheme The AppTheme to base the modifications on.
 	 */
-	private void adjustViewsBasedOnTheme(AppTheme appTheme) {
+	private void adjustViewsBasedOnTheme() {
 		final View root = findViewById(isLandscape? R.id.constraintLayoutRoot : R.id.scrollViewRoot);
 		
 		int[] firstGradient = new int[]{
@@ -148,8 +140,6 @@ public class MainActivity extends AppCompatActivity {
 				getColorAttribute(R.attr.colorGradient2Color1),
 				getColorAttribute(R.attr.colorGradient2Color2)
 		};
-		
-		final Resources res = getResources();
 		
 		final float extent = getFloatValue(R.dimen.scrollingGradientExtent);
 		final float parallaxFactor = getFloatValue(R.dimen.scrollingGradientParallaxFactor);

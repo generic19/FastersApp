@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="28dp"
+        android:padding="5dp"
         tools:context=".view.MainActivity">
 
         <ProgressBar
@@ -19,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="70dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="70dp"
             android:layout_marginEnd="70dp"
             android:background="@drawable/circle_shape"
             android:indeterminate="false"
@@ -37,7 +38,7 @@
             style="@style/TextAppearance.App.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="130dp"
+            android:layout_marginTop="150dp"
             android:text="@string/time_until_break_fast"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintEnd_toEndOf="parent"
@@ -125,7 +126,7 @@
             style="@style/Widget.App.TableCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="70dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -321,16 +322,6 @@
             </TableRow>
 
         </TableLayout>
-
-        <Button
-            android:id="@+id/buttonDebugSwitchTheme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Switch Theme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
         <Button
             android:id="@+id/buttonDebugShowLocationDialog"

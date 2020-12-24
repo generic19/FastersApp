@@ -19,8 +19,22 @@
         <item name="colorGradient2Color2">@color/colorDusk2</item>
 
         <item name="colorProgressAccent">@color/colorDarkGrey</item>
-
         <item name="colorButtonPrimary">@color/colorMidnightBlack</item>
+        <item name="colorControlActivated">@color/colorHotPink</item>
+
+        <item name="colorActivityBackground">@color/colorSunsetPink</item>
+        <item name="colorCardBackground">@color/colorSunsetPinkHaze</item>
+        <item name="colorTitle">@color/colorSunsetShadow</item>
+        <item name="colorCardTitle">@color/colorSunsetShadow</item>
+        <item name="colorDisabledCardTitle">@color/colorMidGrey</item>
+        <item name="colorCardContent">@color/colorSunsetSoftShadow</item>
+        <item name="colorDisabledCardContent">@color/colorLightGrey</item>
+        <item name="colorActiveSwitchForeground">@color/colorHotPink</item>
+        <item name="colorActiveSwitchBackground">@color/colorCareysPink</item>
+        <item name="colorInactiveSwitchForeground">@color/colorBrightWhite</item>
+        <item name="colorInactiveSwitchBackground">@color/colorLighterGrey</item>
+        <item name="colorSeparator">@color/colorPalePink</item>
+        <item name="colorCaption">@color/colorRoomTemperatureDarkGrey</item>
 
     </style>
 
@@ -36,11 +50,35 @@
         <item name="colorGradient2Color2">@color/colorSunrise2</item>
 
         <item name="colorProgressAccent">@android:color/white</item>
-
         <item name="colorButtonPrimary">@color/colorMidnightBlack</item>
+        <item name="colorControlActivated">@color/colorRibbonBlue</item>
+
+        <item name="colorActivityBackground">@color/colorNightBlue</item>
+        <item name="colorCardBackground">@color/colorUrbanNightBlue</item>
+        <item name="colorTitle">@color/colorDayCloud</item>
+        <item name="colorCardTitle">@color/colorDayCloud</item>
+        <item name="colorDisabledCardTitle">@color/colorMidGrey</item>
+        <item name="colorCardContent">@color/colorDayCloud</item>
+        <item name="colorDisabledCardContent">@color/colorLightGrey</item>
+        <item name="colorActiveSwitchForeground">@color/colorRibbonBlue</item>
+        <item name="colorActiveSwitchBackground">@color/colorCobalt</item>
+        <item name="colorInactiveSwitchForeground">@color/colorAbsoluteWhite</item>
+        <item name="colorInactiveSwitchBackground">@color/colorLighterGrey</item>
+        <item name="colorSeparator">@color/colorHazyDusk</item>
+        <item name="colorCaption">@color/colorHazyDay</item>
 
     </style>
 
+
+
+    <style name="Window" />
+
+    <style name="Window.Transition" />
+
+    <style name="Window.Transition.ThemeSwitch">
+        <item name="android:windowEnterAnimation">@anim/window_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/window_fade_out</item>
+    </style>
 
 
 
@@ -104,7 +142,7 @@
 
     <style name="Widget.App.InputField.Layout">
         <item name="android:background">@drawable/rounded_rectangle_4dp</item>
-        <item name="android:backgroundTint">#f1f1f1</item>
+        <item name="android:backgroundTint">#f5ffffff</item>
         <item name="android:paddingTop">4dp</item>
     </style>
 
@@ -124,14 +162,14 @@
     <style name="Widget.App.Button" />
 
     <style name="Widget.App.Button.Primary">
+        <item name="android:layout_height">@dimen/buttonHeight</item>
         <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:background">@drawable/button_stadium</item>
         <item name="backgroundTint">?attr/colorButtonPrimary</item>
         <item name="android:textSize">17sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0</item>
+        <item name="cornerRadius">@dimen/buttonCornerRadius</item>
     </style>
-
 
 
     <style name="ThemeOverlay" />
@@ -142,7 +180,6 @@
         <item name="colorPrimary">#333333</item>
         <item name="colorOnSurface">#99333333</item>
     </style>
-
 
 
     <style name="TextAppearance" />
@@ -205,5 +242,21 @@
         <item name="android:textSize">21sp</item>
         <item name="android:letterSpacing">0.008</item>
     </style>
+
+    <style name="TextAppearance.App.Caption">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.App.Card" />
+
+    <style name="TextAppearance.App.Card.Title">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.App.Card.Content">
+        <item name="android:textSize">14sp</item>
+    </style>
+
 
 </resources>

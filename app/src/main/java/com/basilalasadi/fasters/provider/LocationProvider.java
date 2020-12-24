@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.util.List;
 import com.basilalasadi.fasters.executors.AppExecutors;
-import com.basilalasadi.fasters.util.PermissionsActivity;
+import com.basilalasadi.fasters.view.PermissionsActivity;
 
 import java.util.concurrent.Future;
 

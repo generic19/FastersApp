@@ -36,9 +36,14 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="automatic_location_summary">This app will only read your general location. It will NOT be sent anywhere, and will only be stored on your device to provide you with timings relevant to you.</string>
+    <string name="automatic_location_summary">This app will never share your location. It will only be stored on your device to provide you with timings relevant to you.</string>
     <string name="automatic_location">Automatic Location</string>
     <string name="manual_location">Manual Location</string>
-    <string name="manual_location_summary">Alternatively, you can enter your country and city below, and the app will lookup its coordinates in a preloaded database.</string>
+    <string name="manual_location_summary">Alternatively, you can enter your country and city below, and the app will lookup its coordinates in a built-in database.</string>
     <string name="locate">Locate</string>
+    <string name="location_settings">Location Settings</string>
+    <string name="settings">Settings</string>
+    <string name="method">Method</string>
+    <string name="notifications_settings">Notifications Settings</string>
+    <string name="notifications">Notifications</string>
 </resources>

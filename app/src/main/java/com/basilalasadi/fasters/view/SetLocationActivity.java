@@ -1,5 +1,6 @@
 package com.basilalasadi.fasters.view;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -9,15 +10,17 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.database.CitiesDatabase;
+import com.basilalasadi.fasters.executors.AppExecutors;
 import com.basilalasadi.fasters.model.LocationModel;
 import com.basilalasadi.fasters.model.LocationViewModel;
 import com.basilalasadi.fasters.provider.PreferencesManager;
 import com.basilalasadi.fasters.provider.LocationProvider;
 import com.basilalasadi.fasters.util.ArrayAdapterWithFuzzyFilter;
-import com.basilalasadi.fasters.util.PermissionsActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 
@@ -121,18 +124,19 @@ public class SetLocationActivity extends PermissionsActivity {
 		AutoCompleteTextView actvCity = findViewById(R.id.autoCompleteTextViewCity);
 		
 		
-		appBar.setNavigationOnClickListener((v) -> {
-			finish();
-		});
+		appBar.setNavigationOnClickListener(v -> finish());
 		
 		
-		buttonLocate.setOnClickListener((v) -> {
+		buttonLocate.setOnClickListener((v) -> AppExecutors.ioExecutor.submit(() -> {
 			String errorMessage = fetchLocation();
 			
 			if (errorMessage != null) {
 				Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
 			}
-		});
+			else {
+				Toast.makeText(this, "Location set.", Toast.LENGTH_SHORT).show();
+			}
+		}));
 		
 		
 		buttonSetLocation.setOnClickListener((v) -> {
@@ -169,29 +173,28 @@ public class SetLocationActivity extends PermissionsActivity {
 		});
 		
 		
-		actvCity.setOnItemClickListener((parent, view, position, id) -> {
-			selectedCity = citiesAdapter.getItem(position);
-		});
+		actvCity.setOnItemClickListener((parent, view, position, id) ->
+				selectedCity = citiesAdapter.getItem(position));
 	}
 	
 	
 	private String fetchLocation() {
 		LocationProvider.LocationResult locationResult = LocationProvider.getLocation(this);
-		
+
 		if (locationResult.isError()) {
 			switch (locationResult.getError()) {
 				case LocationProvider.LocationResult.ERROR_NO_PROVIDERS:
 					return "No location providers. Turn on location services.";
-					
+
 				case LocationProvider.LocationResult.ERROR_PERMISSION:
 					return "Permission denied.";
-					
+
 				case LocationProvider.LocationResult.ERROR_NO_LOCATION:
 					return "No location found. Turn on location services.";
-					
+
 				case LocationProvider.LocationResult.ERROR_EXECUTION:
 					return "Could not get location; execution error.";
-					
+
 				default:
 					return "Could not get location; unknown error.";
 			}
@@ -199,9 +202,9 @@ public class SetLocationActivity extends PermissionsActivity {
 		else {
 			CitiesDatabase.CountryAdminCity countryAdminCity =
 					citiesDatabase.findClosestCountryAdminCity(locationResult.longitude, locationResult.latitude);
-			
+
 			LocationModel model;
-			
+
 			if (countryAdminCity == null) {
 				model = new LocationModel(null, null, null, locationResult.longitude, locationResult.latitude);
 			}
@@ -209,9 +212,9 @@ public class SetLocationActivity extends PermissionsActivity {
 				model = new LocationModel(countryAdminCity.country, countryAdminCity.admin,
 						countryAdminCity.city, locationResult.longitude, locationResult.latitude);
 			}
-			
+
 			PreferencesManager.setLocation(prefs, model);
-			
+
 			return null;
 		}
 	}

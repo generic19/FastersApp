@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        app:key="automatic_settings"
+        android:layout="@layout/preference_card"
+        app:title="@string/automatic_location"
+        app:summary="@string/automatic_location_summary" />
+
+    <Preference
+        app:key="manual_settings"
+        app:title="@string/manual_location"
+        app:summary="@string/manual_location_summary"
+        android:layout="@layout/preference_card"
+        app:fragment="com.basilalasadi.fasters.view.settings.ManualLocationSettingsFragment"/>
+
+</PreferenceScreen>

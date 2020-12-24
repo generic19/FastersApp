@@ -1,26 +1,21 @@
-package com.basilalasadi.fasters.util;
+package com.basilalasadi.fasters.view;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.util.SparseArray;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CountedCompleter;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 
-public class PermissionsActivity extends Activity {
+@SuppressWarnings({"unused", "UnusedReturnValue"})
+public abstract class PermissionsActivity extends AppCompatActivity {
 	
 	public interface PermissionsCallback {
 		void onGranted();

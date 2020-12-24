@@ -4,8 +4,8 @@ import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.temporal.TemporalField;
 
+@SuppressWarnings("SpellCheckingInspection")
 public abstract class PrayerTimings {
-	
 	public static final int METHOD_ISLAMIC_SOCIETY_OF_NORTH_AMERICA 				= 0;
 	public static final int METHOD_MUSLIM_WORLD_LEAGUE 								= 1;
 	public static final int METHOD_UMM_AL_QURA_UNIVERSITY_MAKKAH 					= 2;

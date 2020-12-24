@@ -10,5 +10,18 @@
 
     <attr name="colorButtonPrimary" format="color" />
 
+    <attr name="colorActivityBackground" format="color" />
+    <attr name="colorCardBackground" format="color" />
+    <attr name="colorTitle" format="color" />
+    <attr name="colorCardTitle" format="color" />
+    <attr name="colorDisabledCardTitle" format="color" />
+    <attr name="colorCardContent" format="color" />
+    <attr name="colorDisabledCardContent" format="color" />
+    <attr name="colorActiveSwitchForeground" format="color" />
+    <attr name="colorActiveSwitchBackground" format="color" />
+    <attr name="colorInactiveSwitchForeground" format="color" />
+    <attr name="colorInactiveSwitchBackground" format="color" />
+    <attr name="colorSeparator" format="color" />
+    <attr name="colorCaption" format="color" />
 
 </resources>

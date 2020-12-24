@@ -19,4 +19,27 @@
 
     <color name="colorPersianBlue">#1C4AC7</color>
     <color name="colorMidnightBlack">#1e1e1e</color>
+
+    <color name="colorSunsetPink">#CBC1CB</color>
+    <color name="colorSunsetPinkHaze">#D6CED6</color>
+    <color name="colorSunsetShadow">#4C494C</color>
+    <color name="colorSunsetSoftShadow">#656165</color>
+    <color name="colorMidGrey">#929292</color>
+    <color name="colorLightGrey">#AEAEAE</color>
+    <color name="colorHotPink">#DB3965</color>
+    <color name="colorCareysPink">#D3A1AF</color>
+    <color name="colorBrightWhite">#F2F2F2</color>
+    <color name="colorLighterGrey">#A3A3A3</color>
+    <color name="colorPalePink">#BFB8BF</color>
+    <color name="colorRoomTemperatureDarkGrey">#4E4C4C</color>
+
+    <color name="colorNightBlue">#1C232A</color>
+    <color name="colorUrbanNightBlue">#232A31</color>
+    <color name="colorDayCloud">#E1E6EB</color>
+    <color name="colorRibbonBlue">#006FFF</color>
+    <color name="colorCobalt">#0049A8</color>
+    <color name="colorAbsoluteWhite">#FFFFFF</color>
+    <color name="colorHazyDusk">#2F3842</color>
+    <color name="colorHazyDay">#CBD0D4</color>
+
 </resources>

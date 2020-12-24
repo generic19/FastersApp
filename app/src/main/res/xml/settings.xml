@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:layout="@layout/preference_card"
+        app:key="location"
+        app:title="Location"
+        app:fragment="com.basilalasadi.fasters.view.settings.LocationSettingsFragment"/>
+
+    <Preference
+        android:layout="@layout/preference_card"
+        app:key="method"
+        app:title="Method"
+        app:fragment="com.basilalasadi.fasters.view.settings.MethodSettingsFragment"
+        />
+
+    <Preference
+        android:layout="@layout/preference_card"
+        app:key="notifications"
+        app:title="Notifications"
+        app:fragment="com.basilalasadi.fasters.view.settings.NotificationsSettingsFragment"
+        />
+
+    <ListPreference
+        android:layout="@layout/preference_card"
+        app:key="theme"
+        app:title="Theme"
+        android:entries="@array/theme_entries"
+        android:entryValues="@array/theme_entry_values"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false"
+        app:defaultValue="automatic"
+        app:useSimpleSummaryProvider="true"/>
+
+    <PreferenceCategory
+        android:layout="@layout/app_preference_category"
+        app:title="About">
+
+        <Preference
+            android:layout="@layout/dense_preference_top"
+            app:key="about_fasters"
+            app:title="About Fasters" />
+
+        <Preference
+            android:layout="@layout/dense_preference_bottom"
+            app:key="open_source_licenses"
+            app:title="Open-source Licenses" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

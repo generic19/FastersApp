@@ -2,6 +2,11 @@
 <resources>
 
     <dimen name="scrollingGradientExtent">1.5</dimen>
+
     <dimen name="scrollingGradientParallaxFactor">3.5</dimen>
+
+    <dimen name="buttonHeight">60dp</dimen>
+
+    <dimen name="buttonCornerRadius">30dp</dimen>
 
 </resources>

@@ -157,7 +157,8 @@ public final class CitiesDatabase {
 		synchronized (mutex) {
 			final double tolerance = 2;
 			
-			@SuppressLint("DefaultLocale") final String orderBy = String.format(
+			@SuppressLint("DefaultLocale")
+			final String orderBy = String.format(
 					"(longitude - %1$f) * (longitude - %1$f) + (latitude - %2$f) * (latitude - %2$f)",
 					longitude, latitude);
 			

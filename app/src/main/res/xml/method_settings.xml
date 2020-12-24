@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <ListPreference
+        app:key="calculation_method"
+        app:title="Calculation Method"
+        android:entries="@array/calculation_method_entries"
+        android:entryValues="@array/calculation_method_entry_values"
+        android:layout="@layout/preference_card"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false"
+        app:defaultValue="automatic"
+        app:useSimpleSummaryProvider="true"/>
+
+    <PreferenceCategory
+        app:key="custom"
+        app:title="Custom"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false"
+        android:layout="@layout/app_preference_category">
+
+        <EditTextPreference
+            app:key="fajr_sun_angle"
+            app:title="Fajr Sun Angle"
+            app:allowDividerAbove="false"
+            app:allowDividerBelow="false"
+            app:dialogLayout="@layout/decimal_value_dialog"
+            android:layout="@layout/preference_card"
+            app:useSimpleSummaryProvider="true"/>
+
+        <SwitchPreference
+            android:layout="@layout/preference_card"
+            app:allowDividerAbove="false"
+            app:allowDividerBelow="false"
+            app:defaultValue="false"
+            app:key="shafai_method"
+            app:title="Shafai Method for Asr" />
+
+        <ListPreference
+            android:layout="@layout/dense_preference_top"
+            app:key="isha_calculation_method"
+            app:title="Isha Calculation Method"
+            android:entries="@array/isha_calculation_method_entries"
+            android:entryValues="@array/isha_calculation_method_entry_values"
+            app:defaultValue="sun_angle"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:layout="@layout/dense_preference_mid"
+            app:key="isha_sun_angle"
+            app:title="Isha Sun Angle"
+            app:dialogLayout="@layout/decimal_value_dialog"
+            app:useSimpleSummaryProvider="true"/>
+
+        <EditTextPreference
+            android:layout="@layout/dense_preference_mid"
+            app:key="isha_time_offset"
+            app:title="Isha Offset from Magrib"
+            app:dialogLayout="@layout/whole_number_value_dialog"
+            app:useSimpleSummaryProvider="true"/>
+
+        <SwitchPreference
+            android:layout="@layout/dense_preference_mid"
+            app:key="use_ramadan_offset"
+            app:title="Use different offset for Ramadan" />
+
+        <EditTextPreference
+            android:layout="@layout/dense_preference_bottom"
+            app:key="ramadan_isha_time_offset"
+            app:title="Ramadan Isha offset"
+            android:dialogLayout="@layout/whole_number_value_dialog"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
