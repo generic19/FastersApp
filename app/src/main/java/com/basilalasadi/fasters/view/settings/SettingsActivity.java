@@ -2,7 +2,6 @@ package com.basilalasadi.fasters.view.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.view.AppTheme;
@@ -23,8 +23,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		super.onCreate(savedInstanceState);
 		
 		
-		SharedPreferences prefs =
-				getSharedPreferences(getString(R.string.shared_preferences_name), 0);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		int appTheme = prefs.getInt("app_theme", AppTheme.THEME_MORNING);
 		

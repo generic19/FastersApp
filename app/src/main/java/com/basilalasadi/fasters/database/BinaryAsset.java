@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import java.io.BufferedInputStream;
+import androidx.annotation.NonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -94,13 +94,8 @@ public class BinaryAsset {
 			}
 			
 			if (isCompressed) {
-				InputStream fin = null;
-				ZipInputStream zin = null;
 				
-				try {
-					fin = assets.open(path);
-					zin = new ZipInputStream(fin);
-					
+				try (InputStream fin = assets.open(path); ZipInputStream zin = new ZipInputStream(fin)) {
 					boolean inZip = false;
 					
 					while (true) {
@@ -120,14 +115,6 @@ public class BinaryAsset {
 					if (!inZip) {
 						assetPath = null;
 						throw new FileNotFoundException("File not found in archive.");
-					}
-				}
-				finally {
-					if (zin != null) {
-						zin.close();
-					}
-					if (fin != null) {
-						fin.close();
 					}
 				}
 			}
@@ -171,12 +158,12 @@ public class BinaryAsset {
 		}
 		
 		@Override
-		public int read(byte[] b) throws IOException {
+		public int read(@NonNull byte[] b) throws IOException {
 			return inner.read(b);
 		}
 		
 		@Override
-		public int read(byte[] b, int off, int len) throws IOException {
+		public int read(@NonNull byte[] b, int off, int len) throws IOException {
 			return inner.read(b, off, len);
 		}
 		

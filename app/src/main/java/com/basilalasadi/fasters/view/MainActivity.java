@@ -1,6 +1,7 @@
 package com.basilalasadi.fasters.view;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,8 +11,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 		
-		SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_preferences_name), 0);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		int appThemeOrdinal = prefs.getInt("app_theme", AppTheme.Morning.ordinal());
 		AppTheme appTheme = AppTheme.fromOrdinal(appThemeOrdinal);
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 		 * recreates this activity.
 		 */
 		findViewById(R.id.tableLayoutQuickInfo).setOnClickListener((View v) -> {
-			SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_preferences_name), 0);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			
 			int appTheme = prefs.getInt("app_theme", AppTheme.THEME_MORNING);
 			

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Fasters</string>
-    <string name="shared_preferences_name">com_basilalasadi_fasters_sharedpreferences</string>
+    <string name="key_database_version_template">database_%s_version</string>
+
 
     <string name="set_location">Set Location</string>
     <string name="city">City</string>

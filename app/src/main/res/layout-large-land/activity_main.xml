@@ -6,7 +6,7 @@
     android:id="@+id/constraintLayoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2e2e2e"
+    tools:background="#2e2e2e"
     tools:context=".view.MainActivity">
 
     <ProgressBar

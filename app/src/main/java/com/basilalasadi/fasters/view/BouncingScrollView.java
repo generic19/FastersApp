@@ -8,7 +8,7 @@ import android.view.View;
 public class BouncingScrollView extends View {
 	private static final int MAX_Y_OVERSCROLL_DISTANCE = 200;
 	
-	private Context mContext;
+	private final Context mContext;
 	private int mMaxYOverscrollDistance;
 	
 	public BouncingScrollView(Context context) {

@@ -1,6 +1,5 @@
 package com.basilalasadi.fasters.model;
 
-import java.time.Instant;
 import java.util.Date;
 
 public class CountdownViewModel {

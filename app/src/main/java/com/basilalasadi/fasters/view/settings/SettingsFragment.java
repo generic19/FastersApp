@@ -1,11 +1,9 @@
 package com.basilalasadi.fasters.view.settings;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.basilalasadi.fasters.R;

@@ -1,25 +1,21 @@
 package com.basilalasadi.fasters.database;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteStatement;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.basilalasadi.fasters.MyApplication;
+import androidx.preference.PreferenceManager;
+
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.executors.AppExecutors;
 import com.basilalasadi.fasters.provider.PreferencesManager;
-import com.basilalasadi.fasters.util.BinaryReader;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public final class CitiesDatabase {
@@ -51,9 +47,9 @@ public final class CitiesDatabase {
 	
 	private void initializeDatabase(Context context) throws IOException {
 		synchronized (mutex) {
-			SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 			
-			int version = PreferencesManager.getDatabaseVersion(prefs, DATABASE_NAME);
+			int version = PreferencesManager.getDatabaseVersion(prefs, context.getString(R.string.key_database_version_template, DATABASE_NAME));
 			
 			if (version < 1) {
 				context.deleteDatabase(DATABASE_NAME + ".db");
@@ -68,6 +64,13 @@ public final class CitiesDatabase {
 					copyDatabaseFromAssets(context);
 					
 					database = SQLiteDatabase.openDatabase(context.getDatabasePath(DATABASE_NAME + ".db").getPath(), null, SQLiteDatabase.OPEN_READONLY);
+				}
+				
+				if (database != null) {
+					prefs
+							.edit()
+							.putInt(context.getString(R.string.key_database_version_template, DATABASE_NAME), 1)
+							.apply();
 				}
 			}
 		}

@@ -34,13 +34,13 @@ public class ArrayAdapterWithFuzzyFilter<T> extends BaseAdapter implements Filte
 	
 	protected final int layoutResource;
 	
-	protected int dropdownResource;
+	protected final int dropdownResource;
 	
 	protected List<T> objects;
 	
 	protected boolean areObjectsFromResources;
 	
-	protected int fieldId = 0;
+	protected int fieldId;
 	
 	protected boolean notifyOnChange = true;
 	
@@ -52,13 +52,13 @@ public class ArrayAdapterWithFuzzyFilter<T> extends BaseAdapter implements Filte
 	
 	
 	public ArrayAdapterWithFuzzyFilter(@NonNull Context context, @LayoutRes int layoutResource) {
-		this(context, layoutResource, 0, new ArrayList<T>());
+		this(context, layoutResource, 0, new ArrayList<>());
 	}
 	
 	public ArrayAdapterWithFuzzyFilter(@NonNull Context context, @LayoutRes int layoutResource,
 			@IdRes int textViewResourceId) {
 		
-		this(context, layoutResource, textViewResourceId, new ArrayList<T>());
+		this(context, layoutResource, textViewResourceId, new ArrayList<>());
 	}
 	
 	public ArrayAdapterWithFuzzyFilter(@NonNull Context context, @LayoutRes int layoutResource,
@@ -241,8 +241,7 @@ public class ArrayAdapterWithFuzzyFilter<T> extends BaseAdapter implements Filte
 					"ArrayAdapter requires the resource ID to be a TextView", e);
 		}
 		
-		//noinspection unchecked
-		final T item = (T) getItem(position);
+		final T item = getItem(position);
 		
 		if (item instanceof CharSequence) {
 			text.setText((CharSequence) item);
@@ -313,7 +312,7 @@ public class ArrayAdapterWithFuzzyFilter<T> extends BaseAdapter implements Filte
 				final ArrayList<T> sourceValues;
 				
 				synchronized (lock) {
-					sourceValues = new ArrayList<T>(originalValues);
+					sourceValues = new ArrayList<>(originalValues);
 				}
 				
 				final ArrayList<T> firstDegreeValues = new ArrayList<>();

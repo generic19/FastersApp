@@ -3,6 +3,8 @@ package com.basilalasadi.fasters.provider;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.preference.PreferenceManager;
+
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.database.CitiesDatabase;
 
@@ -12,7 +14,7 @@ public final class SettingsManager {
 	
 	private static final SettingsManager instance = new SettingsManager();
 	
-	static SettingsManager getInstance() {
+	public static SettingsManager getInstance() {
 		return instance;
 	}
 	
@@ -21,8 +23,7 @@ public final class SettingsManager {
 	}
 	
 	public synchronized void initializeSettingsWithDefaults(Context context) {
-		SharedPreferences prefs =
-				context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+		SharedPreferences prefs = getPrefs(context);
 		
 		SharedPreferences.Editor editor = prefs.edit();
 		
@@ -35,10 +36,10 @@ public final class SettingsManager {
 		editor.putString(context.getString(R.string.settings_key_isha_calculation_method), context.getString(R.string.isha_calculation_method_value_sun_angle));
 		editor.putString(context.getString(R.string.settings_key_theme),                   context.getString(R.string.theme_value_automatic));
 		
-		editor.putLong(context.getString(R.string.settings_key_fajr_sun_angle),           doubleToLong(15));
-		editor.putLong(context.getString(R.string.settings_key_isha_sun_angle),           doubleToLong(19));
-		editor.putLong(context.getString(R.string.settings_key_isha_time_offset),         doubleToLong(90));
-		editor.putLong(context.getString(R.string.settings_key_ramadan_isha_time_offset), doubleToLong(120));
+		editor.putString(context.getString(R.string.settings_key_fajr_sun_angle),           "15");
+		editor.putString(context.getString(R.string.settings_key_isha_sun_angle),           "19");
+		editor.putString(context.getString(R.string.settings_key_isha_time_offset),         "90");
+		editor.putString(context.getString(R.string.settings_key_ramadan_isha_time_offset), "120");
 		
 		editor.putBoolean(context.getString(R.string.settings_key_shafai_method),              false);
 		editor.putBoolean(context.getString(R.string.settings_key_use_ramadan_offset),         false);
@@ -54,8 +55,7 @@ public final class SettingsManager {
 	}
 	
 	public synchronized void ensureSettingsInitialized(Context context) {
-		SharedPreferences prefs =
-				context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+		SharedPreferences prefs = getPrefs(context);
 		
 		if (!prefs.getBoolean(context.getString(R.string.settings_key_initialized), false)) {
 			initializeSettingsWithDefaults(context);
@@ -177,7 +177,7 @@ public final class SettingsManager {
 	}
 	
 	private SharedPreferences getPrefs(Context context) {
-		return context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+		return PreferenceManager.getDefaultSharedPreferences(context);
 	}
 	
 	private double doubleFromLong(long bits) {

@@ -30,7 +30,7 @@ public class LocationModel {
 		return JsonStream.serialize(this);
 	}
 	
-	public static LocationModel deserialize(String input) throws IOException {
+	public static LocationModel deserialize(String input) {
 		return JsonIterator.deserialize(input, LocationModel.class);
 	}
 }

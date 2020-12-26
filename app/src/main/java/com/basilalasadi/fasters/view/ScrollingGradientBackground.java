@@ -7,12 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import java.util.Arrays;
 
 
 /**
@@ -29,8 +26,8 @@ class ScrollingGradientBackground extends Drawable {
 	private int alpha;
 	private ColorFilter colorFilter;
 	private int scroll;
-	private float gradientExtent;
-	private float parallaxFactor;
+	private final float gradientExtent;
+	private final float parallaxFactor;
 	
 	/**
 	 * @param firstGradient  The ARGB colors of the first gradient. firstGradient and secondGradient

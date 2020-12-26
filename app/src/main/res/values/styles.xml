@@ -162,13 +162,13 @@
     <style name="Widget.App.Button" />
 
     <style name="Widget.App.Button.Primary">
-        <item name="android:layout_height">@dimen/buttonHeight</item>
+        <item name="android:layout_height">20dp</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="backgroundTint">?attr/colorButtonPrimary</item>
         <item name="android:textSize">17sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0</item>
-        <item name="cornerRadius">@dimen/buttonCornerRadius</item>
+        <item name="cornerRadius">10dp</item>
     </style>
 
 

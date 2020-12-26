@@ -1,6 +1,5 @@
 package com.basilalasadi.fasters.view;
 
-import android.app.Activity;
 import android.util.SparseArray;
 
 import androidx.annotation.CallSuper;

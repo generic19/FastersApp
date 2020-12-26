@@ -2,7 +2,6 @@ package com.basilalasadi.fasters.view.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
