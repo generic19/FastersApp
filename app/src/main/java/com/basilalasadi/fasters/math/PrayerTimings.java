@@ -1,142 +1,152 @@
 package com.basilalasadi.fasters.math;
 
 import org.threeten.bp.ZonedDateTime;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.temporal.TemporalField;
 
-@SuppressWarnings("SpellCheckingInspection")
+
+@SuppressWarnings({"SpellCheckingInspection", "unused"})
 public abstract class PrayerTimings {
-	public static final int METHOD_ISLAMIC_SOCIETY_OF_NORTH_AMERICA 				= 0;
-	public static final int METHOD_MUSLIM_WORLD_LEAGUE 								= 1;
-	public static final int METHOD_UMM_AL_QURA_UNIVERSITY_MAKKAH 					= 2;
-	public static final int METHOD_EGYPTIAN_GENERAL_AUTHORITY_OF_SURVEY 			= 3;
-	public static final int METHOD_INSTITUTE_OF_GEOPHYSICS_TEHRAN 					= 4;
-	public static final int METHOD_GULF_REGION 										= 5;
-	public static final int METHOD_KUWAIT 											= 6;
-	public static final int METHOD_QATAR 											= 7;
-	public static final int METHOD_MAJLIS_UGAMA_ISLAM_SINGAPURA_SINGAPORE 			= 8;
-	public static final int METHOD_UNION_ORGANIZATION_ISLAMIC_DE_FRANCE 			= 9;
-	public static final int METHOD_DIYANET_ISLERI_BASKANLIGI_TURKEY 				= 10;
-	public static final int METHOD_SPIRITUAL_ADMINISTRATION_OF_MUSLIMS_OF_RUSSIA 	= 11;
 	
-	
-	public static int getMethodForCountry(String country) {
-		
-		if (
-				country.contains("United States") ||
-				country.contains("Canada") ||
-				country.contains("Mexico"))
-			return METHOD_ISLAMIC_SOCIETY_OF_NORTH_AMERICA;
-		
-		else if (
-				country.contains("Oman") ||
-			    country.contains("Bahrain") ||
-			    country.contains("United Arab Emirates"))
-			return METHOD_GULF_REGION;
-		
-		else if (country.contains("Saudi Arabia"))   return METHOD_UMM_AL_QURA_UNIVERSITY_MAKKAH;
-		else if (country.contains("Egypt"))          return METHOD_EGYPTIAN_GENERAL_AUTHORITY_OF_SURVEY;
-		else if (country.contains("Iran"))           return METHOD_INSTITUTE_OF_GEOPHYSICS_TEHRAN;
-		else if (country.contains("Kuwait"))         return METHOD_KUWAIT;
-		else if (country.contains("Qatar"))          return METHOD_QATAR;
-		else if (country.contains("Singapore"))      return METHOD_MAJLIS_UGAMA_ISLAM_SINGAPURA_SINGAPORE;
-		else if (country.contains("France"))         return METHOD_UNION_ORGANIZATION_ISLAMIC_DE_FRANCE;
-		else if (country.contains("Turkey"))         return METHOD_DIYANET_ISLERI_BASKANLIGI_TURKEY;
-		else if (country.contains("Russia"))         return METHOD_SPIRITUAL_ADMINISTRATION_OF_MUSLIMS_OF_RUSSIA;
-		
-		else return METHOD_MUSLIM_WORLD_LEAGUE;
+	public enum Method {
+		IslamicSocietyOfNorthAmerica,
+		MuslimWorldLeague,
+		UmmAlQuraUniversityMakkah,
+		EgyptianGeneralAuthorityOfSurvey,
+		InstituteOfGeophysicsTehran,
+		GulfRegion,
+		Kuwait,
+		Qatar,
+		MajlisUgamaIslamSingapuraSingapore,
+		UnionOrganizationIslamicDeFrance,
+		DiyanetIsleriBaskanligiTurkey,
+		SpiritualAdministrationOfMuslimsOfRussia,
 	}
 	
-	public static double getFajrAngleDegrees(int method) {
-		
-		switch (method) {
+	private static final String COUNTRY_UNITED_STATES         = "United States";
+	private static final String COUNTRY_CANADA                = "Canada";
+	private static final String COUNTRY_MEXICO                = "Mexico";
+	private static final String COUNTRY_OMAN                  = "Oman";
+	private static final String COUNTRY_BAHRAIN               = "Bahrain";
+	private static final String COUNTRY_UNITED_ARAB_EMIRATES  = "United Arab Emirates";
+	private static final String COUNTRY_SAUDI_ARABIA          = "Saudi Arabia";
+	private static final String COUNTRY_EGYPT                 = "Egypt";
+	private static final String COUNTRY_IRAN                  = "Iran";
+	private static final String COUNTRY_KUWAIT                = "Kuwait";
+	private static final String COUNTRY_QATAR                 = "Qatar";
+	private static final String COUNTRY_SINGAPORE             = "Singapore";
+	private static final String COUNTRY_FRANCE                = "France";
+	private static final String COUNTRY_TURKEY                = "Turkey";
+	private static final String COUNTRY_RUSSIA                = "Russia";
+	
+	
+	public static Method getMethodForCountry(String country) {
+		switch (country) {
+			case COUNTRY_UNITED_STATES:
+			case COUNTRY_CANADA:
+			case COUNTRY_MEXICO:
+				return Method.IslamicSocietyOfNorthAmerica;
+				
+			case COUNTRY_OMAN:
+			case COUNTRY_BAHRAIN:
+			case COUNTRY_UNITED_ARAB_EMIRATES:
+				return Method.GulfRegion;
+				
+			case COUNTRY_SAUDI_ARABIA:  return Method.UmmAlQuraUniversityMakkah;
+			case COUNTRY_EGYPT:         return Method.EgyptianGeneralAuthorityOfSurvey;
+			case COUNTRY_IRAN:          return Method.InstituteOfGeophysicsTehran;
+			case COUNTRY_KUWAIT:        return Method.Kuwait;
+			case COUNTRY_QATAR:         return Method.Qatar;
+			case COUNTRY_SINGAPORE:     return Method.MajlisUgamaIslamSingapuraSingapore;
+			case COUNTRY_FRANCE:        return Method.UnionOrganizationIslamicDeFrance;
+			case COUNTRY_TURKEY:        return Method.DiyanetIsleriBaskanligiTurkey;
+			case COUNTRY_RUSSIA:        return Method.SpiritualAdministrationOfMuslimsOfRussia;
 			
-			case METHOD_ISLAMIC_SOCIETY_OF_NORTH_AMERICA:
-			case METHOD_SPIRITUAL_ADMINISTRATION_OF_MUSLIMS_OF_RUSSIA:
+			default:                    return Method.MuslimWorldLeague;
+		}
+	}
+	
+	public static double getFajrAngleDegrees(Method method) {
+		switch (method) {
+			case IslamicSocietyOfNorthAmerica:
+			case SpiritualAdministrationOfMuslimsOfRussia:
 				return 15;
-				
-			case METHOD_MUSLIM_WORLD_LEAGUE:
-			case METHOD_KUWAIT:
-			case METHOD_MAJLIS_UGAMA_ISLAM_SINGAPURA_SINGAPORE:
-			case METHOD_DIYANET_ISLERI_BASKANLIGI_TURKEY:
+			
+			case MuslimWorldLeague:
+			case Kuwait:
+			case MajlisUgamaIslamSingapuraSingapore:
+			case DiyanetIsleriBaskanligiTurkey:
 				return 18;
-				
-			case METHOD_UMM_AL_QURA_UNIVERSITY_MAKKAH:
+			
+			case UmmAlQuraUniversityMakkah:
 				return 18.5;
-				
-			case METHOD_EGYPTIAN_GENERAL_AUTHORITY_OF_SURVEY:
-			case METHOD_GULF_REGION:
-			case METHOD_QATAR:
-				return 19.5;
-				
-			case METHOD_INSTITUTE_OF_GEOPHYSICS_TEHRAN:
-				return 17.7;
-				
-			case METHOD_UNION_ORGANIZATION_ISLAMIC_DE_FRANCE:
-				return 12;
-				
-			default:
-				return -1;
-				
-		}
-	}
-	
-	public static double getIshaAngleDegrees(int method) {
-		
-		switch (method) {
 			
-			case METHOD_ISLAMIC_SOCIETY_OF_NORTH_AMERICA:
-			case METHOD_SPIRITUAL_ADMINISTRATION_OF_MUSLIMS_OF_RUSSIA:
-			case METHOD_INSTITUTE_OF_GEOPHYSICS_TEHRAN:
-				return 15;
-				
-			case METHOD_MUSLIM_WORLD_LEAGUE:
-			case METHOD_MAJLIS_UGAMA_ISLAM_SINGAPURA_SINGAPORE:
-			case METHOD_DIYANET_ISLERI_BASKANLIGI_TURKEY:
-				return 17;
-				
-			case METHOD_EGYPTIAN_GENERAL_AUTHORITY_OF_SURVEY:
-				return 17.5;
-				
-			case METHOD_KUWAIT:
-				return 18;
-				
-			case METHOD_UNION_ORGANIZATION_ISLAMIC_DE_FRANCE:
+			case EgyptianGeneralAuthorityOfSurvey:
+			case GulfRegion:
+			case Qatar:
+				return 19.5;
+			
+			case InstituteOfGeophysicsTehran:
+				return 17.7;
+			
+			case UnionOrganizationIslamicDeFrance:
 				return 12;
-				
+			
 			default:
 				return -1;
-				
+			
 		}
 	}
 	
-	public static double getIshaFixedOffset(int method, boolean isRamadan) {
-		
+	public static double getIshaAngleDegrees(Method method) {
 		switch (method) {
-			case METHOD_GULF_REGION:
-			case METHOD_QATAR:
+			case IslamicSocietyOfNorthAmerica:
+			case SpiritualAdministrationOfMuslimsOfRussia:
+			case InstituteOfGeophysicsTehran:
+				return 15;
+			
+			case MuslimWorldLeague:
+			case MajlisUgamaIslamSingapuraSingapore:
+			case DiyanetIsleriBaskanligiTurkey:
+				return 17;
+			
+			case EgyptianGeneralAuthorityOfSurvey:
+				return 17.5;
+			
+			case Kuwait:
+				return 18;
+			
+			case UnionOrganizationIslamicDeFrance:
+				return 12;
+			
+			default:
+				return -1;
+			
+		}
+	}
+	
+	public static double getIshaFixedOffset(Method method, boolean isRamadan) {
+		switch (method) {
+			case GulfRegion:
+			case Qatar:
 				return 90;
-				
-			case METHOD_UMM_AL_QURA_UNIVERSITY_MAKKAH:
+			
+			case UmmAlQuraUniversityMakkah:
 				if (isRamadan) {
 					return 120;
 				}
 				else {
 					return 90;
 				}
-				
+			
 			default:
 				return -1;
 		}
 	}
 	
-	public static boolean getHasFixedIshaOffset(int method) {
-		
+	public static boolean getHasFixedIshaOffset(Method method) {
 		switch (method) {
-			
-			case METHOD_GULF_REGION:
-			case METHOD_QATAR:
-			case METHOD_UMM_AL_QURA_UNIVERSITY_MAKKAH:
+			case GulfRegion:
+			case Qatar:
+			case UmmAlQuraUniversityMakkah:
 				return true;
 			
 			default:
@@ -144,127 +154,138 @@ public abstract class PrayerTimings {
 		}
 	}
 	
-	public static double getFajr(int method, double daysSinceEpoch, int timeZone, double longitude,
-			double latitude) {
-		
+	
+	
+	public static double getFajr(double angleDegrees, double daysSinceEpoch, int timeZone, double longitude, double latitude) {
 		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
 		
-		double angleDegrees = getFajrAngleDegrees(method);
-		double angle = Math.toRadians(angleDegrees);
-		
-		double offset = AstronomyMath.noonOffsetFromSunAngle(angle, daysSinceEpoch, latitude);
+		double offset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(angleDegrees), daysSinceEpoch, latitude);
 		
 		return noon - offset / 60;
+	}
+	
+	public static double getFajr(Method method, double daysSinceEpoch, int timeZone, double longitude, double latitude) {
+		return getFajr(getFajrAngleDegrees(method), daysSinceEpoch, timeZone, longitude, latitude);
 	}
 	
 	public static double getDuhr(double daysSinceEpoch, int timeZone, double longitude) {
 		return AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
 	}
 	
-	public static double getAsr(double daysSinceEpoch, int timeZone, double longitude,
-			double latitude, boolean useShafaiMethod) {
+	public static double getAsr(double daysSinceEpoch, int timeZone, double longitude, double latitude,
+			boolean useShafaiMethod) {
 		
 		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
 		
-		double shadowLength = useShafaiMethod? 2 : 1;
-		double offset = AstronomyMath.noonOffsetFromShadowLength(shadowLength, daysSinceEpoch, latitude);
+		double shadowLength = useShafaiMethod ? 2 : 1;
+		double offset =
+				AstronomyMath.noonOffsetFromShadowLength(shadowLength, daysSinceEpoch, latitude);
 		
 		return noon + offset / 60;
 	}
 	
 	public static double getMagrib(double daysSinceEpoch, int timeZone, double longitude, double latitude) {
 		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
-		
 		double offset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
-		
 		return noon + offset / 60;
 	}
 	
-	public static double getIsha(int method, double daysSinceEpoch, int timeZone, double longitude,
-			double latitude, boolean isRamadan) {
+	public static double getIsha(double angleDegrees, double daysSinceEpoch, int timeZone,
+			double longitude, double latitude) {
+		
+		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double offset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(angleDegrees), daysSinceEpoch, latitude);
+		return noon + offset / 60;
+	}
+	
+	public static double getIsha(int offsetFromSunsetMinutes, double daysSinceEpoch, int timeZone,
+			double longitude, double latitude) {
+		
+		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		return noon + (magribOffset + offsetFromSunsetMinutes) / 60;
+	}
+	
+	public static double getIsha(Method method, double daysSinceEpoch, int timeZone,
+			double longitude, double latitude, boolean isRamadan) {
 		
 		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
 		
 		if (getHasFixedIshaOffset(method)) {
-			double fixedTimeOffset = getIshaFixedOffset(method, isRamadan);
-			double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
-			
-			return noon + (magribOffset + fixedTimeOffset) / 60;
+			return getIsha(getIshaFixedOffset(method, isRamadan), daysSinceEpoch, timeZone, longitude, latitude);
 		}
 		else {
-			double angleDegrees = getIshaAngleDegrees(method);
-			double angle = Math.toRadians(angleDegrees);
-			
-			double offset = AstronomyMath.noonOffsetFromSunAngle(angle, daysSinceEpoch, latitude);
-			
-			return noon + offset / 60;
+			return getIsha(getIshaAngleDegrees(method), daysSinceEpoch, timeZone, longitude, latitude);
 		}
 	}
 	
-	public static double[] getTimings(int method, double daysSinceEpoch, int timeZone,
-			double longitude, double latitude, boolean isRamadan, boolean useShafaiMethod) {
-		
-		double[] timings = new double[5];
+	public static double[] getTimings(double fajrAngleDegrees, boolean useShafaiMethod, double ishaAngleDegrees,
+			double daysSinceEpoch, int timeZone, double longitude, double latitude) {
 		
 		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double fajrOffset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(fajrAngleDegrees), daysSinceEpoch, latitude);
+		double asrOffset = AstronomyMath.noonOffsetFromShadowLength(useShafaiMethod ? 2 : 1, daysSinceEpoch, latitude);
+		double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		double ishaOffset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(ishaAngleDegrees), daysSinceEpoch, latitude);
 		
-		// Duhr timing
-		timings[1] = noon;
+		return new double[]{
+				noon - fajrOffset / 60,
+				noon,
+				noon + asrOffset / 60,
+				noon + magribOffset / 60,
+				noon + ishaOffset / 60,
+		};
+	}
+	
+	public static double[] getTimings(double fajrAngleDegrees, boolean useShafaiMethod, int ishaTimeOffsetMinutes,
+			double daysSinceEpoch, int timeZone, double longitude, double latitude) {
 		
-		// Fajr timing
-		{
-			double angleDegrees = getFajrAngleDegrees(method);
-			double angle = Math.toRadians(angleDegrees);
-			
-			double offset = AstronomyMath.noonOffsetFromSunAngle(angle, daysSinceEpoch, latitude);
-			
-			timings[0] = noon - offset / 60;
+		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double fajrOffset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(fajrAngleDegrees), daysSinceEpoch, latitude);
+		double asrOffset = AstronomyMath.noonOffsetFromShadowLength(useShafaiMethod ? 2 : 1, daysSinceEpoch, latitude);
+		double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		
+		return new double[]{
+				noon - fajrOffset / 60,
+				noon,
+				noon + asrOffset / 60,
+				noon + magribOffset / 60,
+				noon + ishaTimeOffsetMinutes / 60d,
+		};
+	}
+	
+	public static double[] getTimings(Method method, double daysSinceEpoch, int timeZone,
+			double longitude, double latitude, boolean isRamadan, boolean useShafaiMethod) {
+		
+		if (getHasFixedIshaOffset(method)) {
+			return getTimings(
+					getFajrAngleDegrees(method),
+					useShafaiMethod,
+					getIshaFixedOffset(method, isRamadan),
+					daysSinceEpoch,
+					timeZone,
+					longitude,
+					latitude);
 		}
-		
-		// Asr timing
-		{
-			double shadowLength = useShafaiMethod? 2 : 1;
-			double offset = AstronomyMath.noonOffsetFromShadowLength(shadowLength, daysSinceEpoch, latitude);
-			
-			timings[2] = noon + offset / 60;
+		else {
+			return getTimings(
+					getFajrAngleDegrees(method),
+					useShafaiMethod,
+					getIshaAngleDegrees(method),
+					daysSinceEpoch,
+					timeZone,
+					longitude,
+					latitude);
 		}
-		
-		// Magrib timing
-		{
-			double offset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
-			
-			timings[3] = noon + offset / 60;
-		}
-		
-		// Isha timing
-		{
-			if (getHasFixedIshaOffset(method)) {
-				double fixedTimeOffset = getIshaFixedOffset(method, isRamadan);
-				
-				timings[4] = timings[3] + fixedTimeOffset / 60;
-			}
-			else {
-				double angleDegrees = getIshaAngleDegrees(method);
-				double angle = Math.toRadians(angleDegrees);
-				
-				double offset = AstronomyMath.noonOffsetFromSunAngle(angle, daysSinceEpoch, latitude);
-				
-				timings[4] = noon + offset / 60;
-			}
-		}
-		
-		return timings;
 	}
 	
 	public static double toDaysSinceEpoch2000(ZonedDateTime date) {
-		return AstronomyMath.daysSinceEpoch(
-				date.getYear(),
+		return AstronomyMath.daysSinceEpoch(date.getYear(),
 				date.getMonthValue(),
 				date.getDayOfMonth(),
 				date.getHour(),
 				date.getMinute(),
-				date.getOffset().getTotalSeconds() / 60 / 60
-		);
+				date.getOffset().getTotalSeconds() / 60 / 60);
 	}
 	
 	public static double toDaysSinceEpoch2000() {

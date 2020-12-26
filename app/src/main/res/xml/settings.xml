@@ -25,28 +25,28 @@
 
     <ListPreference
         android:layout="@layout/preference_card"
-        app:key="theme"
-        app:title="Theme"
+        app:key="@string/settings_key_theme"
+        app:title="@string/theme"
         android:entries="@array/theme_entries"
         android:entryValues="@array/theme_entry_values"
         app:allowDividerAbove="false"
         app:allowDividerBelow="false"
-        app:defaultValue="automatic"
+        app:defaultValue="@string/theme_value_automatic"
         app:useSimpleSummaryProvider="true"/>
 
     <PreferenceCategory
         android:layout="@layout/app_preference_category"
-        app:title="About">
+        app:title="@string/about">
 
         <Preference
             android:layout="@layout/dense_preference_top"
             app:key="about_fasters"
-            app:title="About Fasters" />
+            app:title="@string/about_fasters" />
 
         <Preference
             android:layout="@layout/dense_preference_bottom"
             app:key="open_source_licenses"
-            app:title="Open-source Licenses" />
+            app:title="@string/open_source_licenses" />
 
     </PreferenceCategory>
 

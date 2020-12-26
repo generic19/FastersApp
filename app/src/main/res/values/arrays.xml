@@ -2,35 +2,59 @@
 <resources>
 
     <string-array name="theme_entries">
-        <item>Automatic</item>
-        <item>Dusk</item>
-        <item>Dawn</item>
+        <item>@string/theme_label_automatic</item>
+        <item>@string/theme_label_dusk</item>
+        <item>@string/theme_label_dawn</item>
     </string-array>
 
     <string-array name="theme_entry_values">
-        <item>automatic</item>
-        <item>dusk</item>
-        <item>dawn</item>
+        <item>@string/theme_value_automatic</item>
+        <item>@string/theme_value_dusk</item>
+        <item>@string/theme_value_dawn</item>
     </string-array>
 
     <string-array name="calculation_method_entries">
-        <item>Automatic</item>
-        <item>Custom</item>
+        <item>@string/calculation_method_label_automatic</item>
+        <item>@string/calculation_method_label_islamic_society_of_north_america</item>
+        <item>@string/calculation_method_label_muslim_world_league</item>
+        <item>@string/calculation_method_label_umm_al_qura_university_makkah</item>
+        <item>@string/calculation_method_label_egyptian_general_authority_of_survey</item>
+        <item>@string/calculation_method_label_institute_of_geophysics_tehran</item>
+        <item>@string/calculation_method_label_gulf_region</item>
+        <item>@string/calculation_method_label_kuwait</item>
+        <item>@string/calculation_method_label_qatar</item>
+        <item>@string/calculation_method_label_majlis_ugama_islam_singapura_singapore</item>
+        <item>@string/calculation_method_label_union_organization_islamic_de_france</item>
+        <item>@string/calculation_method_label_diyanet_isleri_baskanligi_turkey</item>
+        <item>@string/calculation_method_label_spiritual_administration_of_muslims_of_russia</item>
+        <item>@string/calculation_method_label_custom</item>
     </string-array>
 
     <string-array name="calculation_method_entry_values">
-        <item>automatic</item>
-        <item>custom</item>
+        <item>@string/calculation_method_value_automatic</item>
+        <item>@string/calculation_method_value_islamic_society_of_north_america</item>
+        <item>@string/calculation_method_value_muslim_world_league</item>
+        <item>@string/calculation_method_value_umm_al_qura_university_makkah</item>
+        <item>@string/calculation_method_value_egyptian_general_authority_of_survey</item>
+        <item>@string/calculation_method_value_institute_of_geophysics_tehran</item>
+        <item>@string/calculation_method_value_gulf_region</item>
+        <item>@string/calculation_method_value_kuwait</item>
+        <item>@string/calculation_method_value_qatar</item>
+        <item>@string/calculation_method_value_majlis_ugama_islam_singapura_singapore</item>
+        <item>@string/calculation_method_value_union_organization_islamic_de_france</item>
+        <item>@string/calculation_method_value_diyanet_isleri_baskanligi_turkey</item>
+        <item>@string/calculation_method_value_spiritual_administration_of_muslims_of_russia</item>
+        <item>@string/calculation_method_value_custom</item>
     </string-array>
 
     <string-array name="isha_calculation_method_entries">
-        <item>Sun angle</item>
-        <item>Use fixed time offset</item>
+        <item>@string/isha_calculation_method_label_sun_angle</item>
+        <item>@string/isha_calculation_method_label_time_offset</item>
     </string-array>
 
     <string-array name="isha_calculation_method_entry_values">
-        <item>sun_angle</item>
-        <item>time_offset</item>
+        <item>@string/isha_calculation_method_value_sun_angle</item>
+        <item>@string/isha_calculation_method_value_time_offset</item>
     </string-array>
 
 </resources>

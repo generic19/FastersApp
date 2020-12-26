@@ -8,19 +8,6 @@ import com.basilalasadi.fasters.database.CitiesDatabase;
 
 
 public final class SettingsManager {
-	
-	public static final String KEY_COUNTRY = "country";
-	public static final String KEY_CITY = "city";
-	public static final String KEY_LONGITUDE = "longitude";
-	public static final String KEY_LATITUDE = "latitude";
-	public static final String KEY_CALCULATION_METHOD = "calculation_method";
-	public static final String KEY_FAJR_SUN_ANGLE = "fajr_sun_angle";
-	public static final String KEY_SHAFAI_METHOD = "shafai_method";
-	public static final String KEY_ISHA_CALCULATION_METHOD = "isha_calculation_method";
-	public static final String KEY_ISHA_TIME_OFFSET = "isha_time_offset";
-	public static final String KEY_USE_RAMADAN_OFFSET = "use_ramadan_offset";
-	public static final String KEY_RAMADAN_ISHA_TIME_OFFSET = "ramadan_isha_time_offset";
-	
 	public static final String ADMIN_CITY_SEPARATOR = "\u200b, ";
 	
 	private static final SettingsManager instance = new SettingsManager();
@@ -33,11 +20,53 @@ public final class SettingsManager {
 	
 	}
 	
+	public synchronized void initializeSettingsWithDefaults(Context context) {
+		SharedPreferences prefs =
+				context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+		
+		SharedPreferences.Editor editor = prefs.edit();
+		
+		editor.remove(context.getString(R.string.settings_key_country));
+		editor.remove(context.getString(R.string.settings_key_city));
+		editor.remove(context.getString(R.string.settings_key_longitude));
+		editor.remove(context.getString(R.string.settings_key_latitude));
+		
+		editor.putString(context.getString(R.string.settings_key_calculation_method),      context.getString(R.string.calculation_method_value_automatic));
+		editor.putString(context.getString(R.string.settings_key_isha_calculation_method), context.getString(R.string.isha_calculation_method_value_sun_angle));
+		editor.putString(context.getString(R.string.settings_key_theme),                   context.getString(R.string.theme_value_automatic));
+		
+		editor.putLong(context.getString(R.string.settings_key_fajr_sun_angle),           doubleToLong(15));
+		editor.putLong(context.getString(R.string.settings_key_isha_sun_angle),           doubleToLong(19));
+		editor.putLong(context.getString(R.string.settings_key_isha_time_offset),         doubleToLong(90));
+		editor.putLong(context.getString(R.string.settings_key_ramadan_isha_time_offset), doubleToLong(120));
+		
+		editor.putBoolean(context.getString(R.string.settings_key_shafai_method),              false);
+		editor.putBoolean(context.getString(R.string.settings_key_use_ramadan_offset),         false);
+		editor.putBoolean(context.getString(R.string.settings_key_all_notifications),          true);
+		editor.putBoolean(context.getString(R.string.settings_key_prefast_meal_reminder),      true);
+		editor.putBoolean(context.getString(R.string.settings_key_water_reminder),             true);
+		editor.putBoolean(context.getString(R.string.settings_key_prepare_breakfast_reminder), true);
+		editor.putBoolean(context.getString(R.string.settings_key_breakfast_near_reminder),    true);
+		
+		editor.putBoolean(context.getString(R.string.settings_key_initialized), true);
+		
+		editor.apply();
+	}
+	
+	public synchronized void ensureSettingsInitialized(Context context) {
+		SharedPreferences prefs =
+				context.getSharedPreferences(context.getString(R.string.shared_preferences_name), 0);
+		
+		if (!prefs.getBoolean(context.getString(R.string.settings_key_initialized), false)) {
+			initializeSettingsWithDefaults(context);
+		}
+	}
+	
 	public synchronized String[] getLocation(Context context) {
 		SharedPreferences prefs = getPrefs(context);
 		
-		String country = prefs.getString(KEY_COUNTRY, null);
-		String city = prefs.getString(KEY_CITY, null);
+		String country = prefs.getString(context.getString(R.string.settings_key_country), null);
+		String city = prefs.getString(context.getString(R.string.settings_key_city), null);
 		
 		if (country == null || city == null) {
 			return null;
@@ -51,8 +80,8 @@ public final class SettingsManager {
 		SharedPreferences prefs = getPrefs(context);
 		SharedPreferences.Editor editor = prefs.edit();
 		
-		editor.putString(KEY_COUNTRY, country);
-		editor.putString(KEY_CITY, adminCity);
+		editor.putString(context.getString(R.string.settings_key_country), country);
+		editor.putString(context.getString(R.string.settings_key_city), adminCity);
 		
 		editor.apply();
 	}
@@ -61,8 +90,8 @@ public final class SettingsManager {
 		SharedPreferences prefs = getPrefs(context);
 		SharedPreferences.Editor editor = prefs.edit();
 		
-		editor.putLong(KEY_LONGITUDE, doubleToLong(longitude));
-		editor.putLong(KEY_LATITUDE, doubleToLong(latitude));
+		editor.putLong(context.getString(R.string.settings_key_longitude), doubleToLong(longitude));
+		editor.putLong(context.getString(R.string.settings_key_latitude), doubleToLong(latitude));
 		
 		editor.apply();
 	}
@@ -94,11 +123,11 @@ public final class SettingsManager {
 	public synchronized CustomMethod getCustomMethod(Context context) {
 		SharedPreferences prefs = getPrefs(context);
 		
-		if (prefs.getString(KEY_CALCULATION_METHOD, "automatic").equals("automatic")) {
+		if (prefs.getString(context.getString(R.string.settings_key_calculation_method), "automatic").equals("automatic")) {
 			return new CustomMethod();
 		}
 		
-		String fajrAngleString = prefs.getString(KEY_FAJR_SUN_ANGLE, null);
+		String fajrAngleString = prefs.getString(context.getString(R.string.settings_key_fajr_sun_angle), null);
 		
 		if (fajrAngleString == null) {
 			return null;
@@ -106,12 +135,12 @@ public final class SettingsManager {
 		
 		double fajrAngle = Double.parseDouble(fajrAngleString);
 		
-		boolean useShafaiMethod = prefs.getBoolean(KEY_SHAFAI_METHOD, false);
+		boolean useShafaiMethod = prefs.getBoolean(context.getString(R.string.settings_key_shafai_method), false);
 		
-		boolean useFixedOffset = prefs.getString(KEY_ISHA_CALCULATION_METHOD, "sun_angle").equals("fixed_offset");
+		boolean useFixedOffset = prefs.getString(context.getString(R.string.settings_key_isha_calculation_method), "sun_angle").equals("fixed_offset");
 		
 		if (useFixedOffset) {
-			String timeOffsetString = prefs.getString(KEY_ISHA_TIME_OFFSET, null);
+			String timeOffsetString = prefs.getString(context.getString(R.string.settings_key_isha_time_offset), null);
 			
 			if (timeOffsetString == null) {
 				return null;
@@ -119,8 +148,8 @@ public final class SettingsManager {
 			
 			int timeOffset = Integer.parseInt(timeOffsetString);
 			
-			if (prefs.getBoolean(KEY_USE_RAMADAN_OFFSET, false)) {
-				String ramadanTimeOffsetString = prefs.getString(KEY_RAMADAN_ISHA_TIME_OFFSET, null);
+			if (prefs.getBoolean(context.getString(R.string.settings_key_use_ramadan_offset), false)) {
+				String ramadanTimeOffsetString = prefs.getString(context.getString(R.string.settings_key_ramadan_isha_time_offset), null);
 				
 				if (ramadanTimeOffsetString == null) {
 					return null;
@@ -135,7 +164,7 @@ public final class SettingsManager {
 			}
 		}
 		else {
-			String ishaAngleString = prefs.getString(KEY_FAJR_SUN_ANGLE, null);
+			String ishaAngleString = prefs.getString(context.getString(R.string.settings_key_fajr_sun_angle), null);
 			
 			if (ishaAngleString == null) {
 				return null;

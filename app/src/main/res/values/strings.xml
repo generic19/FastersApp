@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Fasters</string>
     <string name="shared_preferences_name">com_basilalasadi_fasters_sharedpreferences</string>
+
     <string name="set_location">Set Location</string>
     <string name="city">City</string>
     <string name="country">Country</string>
@@ -16,34 +17,109 @@
     <string name="minutes">minutes</string>
     <string name="time_separator">:</string>
     <string name="time_until_break_fast">Time until break-fast</string>
-    <string name="subdivision">Subdivision</string>
-    <string name="detect_location">Detect Location</string>
-    <string name="location_dialog_title">Enter location manually</string>
-    <string name="location_dialog_content">The app is unable to detect coarse location. Either turn on location services and accept location permission, or enter it manually.\n\nYour coarse location is needed to request prayer timings that are relevant to your location.</string>
-    <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <!--Settings labels-->
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="automatic_location_summary">This app will never share your location. It will only be stored on your device to provide you with timings relevant to you.</string>
+    <string name="settings">Settings</string>
+
+    <string name="location">Location</string>
+
     <string name="automatic_location">Automatic Location</string>
+    <string name="automatic_location_summary">This app will never share your location. It will only be stored on your device to provide you with timings relevant to you.</string>
+
     <string name="manual_location">Manual Location</string>
     <string name="manual_location_summary">Alternatively, you can enter your country and city below, and the app will lookup its coordinates in a built-in database.</string>
-    <string name="locate">Locate</string>
-    <string name="location_settings">Location Settings</string>
-    <string name="settings">Settings</string>
+
     <string name="method">Method</string>
-    <string name="notifications_settings">Notifications Settings</string>
+
+    <string name="calculation_method">Calculation Method</string>
+
+    <string name="custom">Custom</string>
+    <string name="fajr_sun_angle">Fajr Sun Angle</string>
+    <string name="shafai_method_for_asr">Shafai Method for Asr</string>
+    <string name="isha_sun_angle">Isha Sun Angle</string>
+    <string name="isha_calculation_method">Isha Calculation Method</string>
+    <string name="isha_offset_from_magrib">Isha Offset from Magrib</string>
+    <string name="use_different_offset_for_ramadan">Use different offset for Ramadan</string>
+    <string name="ramadan_isha_offset">Ramadan Isha Offset</string>
+
+
+    <string name="theme">Theme</string>
     <string name="notifications">Notifications</string>
+    <string name="about">About</string>
+    <string name="about_fasters">About Fasters</string>
+    <string name="open_source_licenses">Open-source Licenses</string>
+
+
+    <!--Settings keys-->
+    <string name="settings_key_initialized">settings_initialized</string>
+    <string name="settings_key_country">country</string>
+    <string name="settings_key_city">city</string>
+    <string name="settings_key_longitude">longitude</string>
+    <string name="settings_key_latitude">latitude</string>
+    <string name="settings_key_calculation_method">calculation_method</string>
+    <string name="settings_key_fajr_sun_angle">fajr_sun_angle</string>
+    <string name="settings_key_shafai_method">shafai_method</string>
+    <string name="settings_key_isha_calculation_method">isha_calculation_method</string>
+    <string name="settings_key_isha_sun_angle">isha_sun_angle</string>
+    <string name="settings_key_isha_time_offset">isha_time_offset</string>
+    <string name="settings_key_use_ramadan_offset">use_ramadan_offset</string>
+    <string name="settings_key_ramadan_isha_time_offset">ramadan_isha_time_offset</string>
+    <string name="settings_key_all_notifications">all_notifications</string>
+    <string name="settings_key_prefast_meal_reminder">prefast_meal_reminder</string>
+    <string name="settings_key_water_reminder">water_reminder</string>
+    <string name="settings_key_prepare_breakfast_reminder">prepare_breakfast_reminder</string>
+    <string name="settings_key_breakfast_near_reminder">breakfast_near_reminder</string>
+    <string name="settings_key_theme">theme</string>
+
+
+    <!--List preferences labels and values-->
+
+    <string name="theme_label_automatic">Automatic</string>
+    <string name="theme_label_dusk">Dusk</string>
+    <string name="theme_label_dawn">Dawn</string>
+
+    <string name="theme_value_automatic">automatic</string>
+    <string name="theme_value_dusk">dusk</string>
+    <string name="theme_value_dawn">dawn</string>
+
+    <string name="calculation_method_label_automatic">Automatic</string>
+    <string name="calculation_method_label_islamic_society_of_north_america">Islamic Society of North America</string>
+    <string name="calculation_method_label_muslim_world_league">Muslim World League</string>
+    <string name="calculation_method_label_umm_al_qura_university_makkah">Umm Al Qura University Makkah</string>
+    <string name="calculation_method_label_egyptian_general_authority_of_survey">Egyptian General Authority Of Survey</string>
+    <string name="calculation_method_label_institute_of_geophysics_tehran">Institute of Geophysics Tehran</string>
+    <string name="calculation_method_label_gulf_region">Gulf Region</string>
+    <string name="calculation_method_label_kuwait">Kuwait</string>
+    <string name="calculation_method_label_qatar">Qatar</string>
+    <string name="calculation_method_label_majlis_ugama_islam_singapura_singapore">Majlis Ugama Islam Singapura Singapore</string>
+    <string name="calculation_method_label_union_organization_islamic_de_france">Union Organization Islamic de France</string>
+    <string name="calculation_method_label_diyanet_isleri_baskanligi_turkey">Diyanet Isleri Baskanligi Turkey</string>
+    <string name="calculation_method_label_spiritual_administration_of_muslims_of_russia">Spiritual Administration of Muslims of Russia</string>
+    <string name="calculation_method_label_custom">Custom</string>
+
+    <string name="calculation_method_value_automatic">automatic</string>
+    <string name="calculation_method_value_islamic_society_of_north_america">islamic_society_of_north_america</string>
+    <string name="calculation_method_value_muslim_world_league">muslim_world_league</string>
+    <string name="calculation_method_value_umm_al_qura_university_makkah">umm_al_qura_university_makkah</string>
+    <string name="calculation_method_value_egyptian_general_authority_of_survey">egyptian_general_authority_of_survey</string>
+    <string name="calculation_method_value_institute_of_geophysics_tehran">institute_of_geophysics_tehran</string>
+    <string name="calculation_method_value_gulf_region">gulf_region</string>
+    <string name="calculation_method_value_kuwait">kuwait</string>
+    <string name="calculation_method_value_qatar">qatar</string>
+    <string name="calculation_method_value_majlis_ugama_islam_singapura_singapore">majlis_ugama_islam_singapura_singapore</string>
+    <string name="calculation_method_value_union_organization_islamic_de_france">union_organization_islamic_de_france</string>
+    <string name="calculation_method_value_diyanet_isleri_baskanligi_turkey">diyanet_isleri_baskanligi_turkey</string>
+    <string name="calculation_method_value_spiritual_administration_of_muslims_of_russia">spiritual_administration_of_muslims_of_russia</string>
+    <string name="calculation_method_value_custom">custom</string>
+
+    <string name="isha_calculation_method_label_sun_angle">Sun angle</string>
+    <string name="isha_calculation_method_label_time_offset">Use fixed time offset</string>
+
+    <string name="isha_calculation_method_value_sun_angle">sun_angle</string>
+    <string name="isha_calculation_method_value_time_offset">time_offset</string>
+
+
+
 </resources>

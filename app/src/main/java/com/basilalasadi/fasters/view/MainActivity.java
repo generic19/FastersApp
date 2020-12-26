@@ -11,6 +11,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -45,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
 	protected void addListeners() {
 		final View root = findViewById(isLandscape? R.id.constraintLayoutRoot : R.id.scrollViewRoot);
 		final ScrollView scrollView = findViewById(isLandscape? R.id.scrollViewInfo : R.id.scrollViewRoot);
-		
-		final Button buttonLaunchSettingsActivity = findViewById(R.id.buttonDebugShowLocationDialog);
 		
 		/*
 		 * Pre-draw listener. Executes once, then removes itself.
@@ -98,7 +97,14 @@ public class MainActivity extends AppCompatActivity {
 		});
 		
 		
-		buttonLaunchSettingsActivity.setOnClickListener((View v) -> {
+		findViewById(R.id.buttonSettings).setOnClickListener(view -> {
+			Intent intent = new Intent(this, SettingsActivity.class);
+			
+			startActivity(intent);
+		});
+		
+		
+		findViewById(R.id.buttonDebugLaunchActivity).setOnClickListener((View v) -> {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 		});
