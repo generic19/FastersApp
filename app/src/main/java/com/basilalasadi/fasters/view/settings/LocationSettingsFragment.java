@@ -25,6 +25,6 @@ public class LocationSettingsFragment extends PreferenceFragmentCompat {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //noinspection ConstantConditions
-        getActivity().setTitle(R.string.location_settings);
+        getActivity().setTitle(R.string.location);
     }
 }
