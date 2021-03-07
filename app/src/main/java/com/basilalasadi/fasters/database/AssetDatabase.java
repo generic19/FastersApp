@@ -13,12 +13,24 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+
+/**
+ * Class to unpack a database from assets.
+ */
 public class AssetDatabase {
 	protected final Context context;
 	protected final String name;
 	protected final String assetPath;
 	protected final boolean isCompressed;
-
+	
+	/**
+	 * Tries to find the database specified in the assets dir. Use `openDatabase()` to get the
+	 * database object; it will unpack the database if not already unpacked.
+	 *
+	 * @param context Current context.
+	 * @param name The name of the database.
+	 * @throws IOException if asset not found.
+	 */
 	public AssetDatabase(Context context, String name) throws IOException {
 		this.context = context;
 		this.name = name;
@@ -39,14 +51,27 @@ public class AssetDatabase {
 		isCompressed = pathResult.isCompressed;
 	}
 	
+	/**
+	 * Returns the path to the unpacked database.
+	 * @return Path to unpacked database.
+	 */
 	public File databasePath() {
 		return context.getDatabasePath(name + ".db");
 	}
 	
+	/**
+	 * Checks whether the unpacked database exists.
+	 * @return true if database file exists in databases directory.
+	 */
 	public boolean databaseExists() {
 		 return databasePath().isFile();
 	}
 	
+	/**
+	 * Unpacks the database from assets.
+	 * @throws IOException if database is not found in the database, or asset archive does not
+	 *                     contain a database.
+	 */
 	protected void unpack() throws IOException {
 		File databasePath = context.getDatabasePath(name + ".db");
 		final AssetManager assets = context.getAssets();
@@ -114,6 +139,11 @@ public class AssetDatabase {
 		}
 	}
 	
+	/**
+	 * Opens the database. Unpacks the database from assets if is not already unpacked.
+	 * @return database object.
+	 * @throws IOException if opening database fails.
+	 */
 	public SQLiteDatabase openDatabase() throws IOException {
 		if (!databaseExists()) {
 			unpack();
@@ -122,8 +152,17 @@ public class AssetDatabase {
 		return SQLiteDatabase.openDatabase(databasePath().getPath(), null, SQLiteDatabase.OPEN_READONLY);
 	}
 	
+	public void deleteDatabase() {
+		context.deleteDatabase(name + ".db");
+	}
 	
+	/**
+	 * Inner utilities class for AssetDatabase.
+	 */
 	protected static class Util {
+		/**
+		 * Container class for the result of `findValidPath()`.
+		 */
 		public static final class PathResult {
 			public final String path;
 			public final boolean isCompressed;
@@ -134,6 +173,12 @@ public class AssetDatabase {
 			}
 		}
 		
+		/**
+		 * Tries to find the database asset path for the database specified in the `name` argument.
+		 * @param paths Array of paths to search in.
+		 * @param name Name of the database.
+		 * @return PathResult object if the dataabase is found, or null if not found.
+		 */
 		public static PathResult findValidPath(String[] paths, String name) {
 			String assetPath = null;
 			boolean isCompressed = false;
