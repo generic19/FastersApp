@@ -123,7 +123,7 @@ public final class SettingsManager {
 	 * @param context The current context.
 	 * @return the coordinates.
 	 */
-	private synchronized Coordinates getCoordinates(Context context) {
+	public synchronized Coordinates getCoordinates(Context context) {
 		SharedPreferences prefs = getPrefs(context);
 		
 		long longitudeBits = prefs.getLong(context.getString(R.string.settings_key_longitude), -1);
