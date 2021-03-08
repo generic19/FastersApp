@@ -7,22 +7,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="#313131"
-    tools:context=".view.MainActivity">
+    tools:context=".view.MainActivity"
+    tools:ignore="HardcodedText">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="28dp"
-        android:padding="5dp"
+        android:padding="10dp"
         tools:context=".view.MainActivity">
 
         <ImageButton
             android:id="@+id/buttonSettings"
+            android:contentDescription="Settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
+            android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_settings_24"
             app:layout_constraintBottom_toTopOf="@+id/tableLayoutQuickInfo"
@@ -52,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="130dp"
-            android:text="@string/time_until_break_fast"
+            android:text="@string/time_until_fasting"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -337,6 +339,7 @@
         </TableLayout>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/buttonDebugLaunchActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -347,6 +350,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tableLayoutPrayerTimes" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonExecuteDebugFunction"
@@ -355,6 +359,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonDebugLaunchActivity" />
 
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableLayoutPrayerTimes" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,5 +1,6 @@
 package com.basilalasadi.fasters.view;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
@@ -11,17 +12,51 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.basilalasadi.fasters.BuildConfig;
 import com.basilalasadi.fasters.R;
+import com.basilalasadi.fasters.model.CountdownViewModel;
+import com.basilalasadi.fasters.state.ActivityState;
+import com.basilalasadi.fasters.state.MainActivityState;
 import com.basilalasadi.fasters.view.settings.SettingsActivity;
+
+import org.threeten.bp.LocalDateTime;
 
 
 public class MainActivity extends AppCompatActivity {
-	ScrollingGradientBackground scrollingBackground;
-	boolean isLandscape;
+	private ScrollingGradientBackground scrollingBackground;
+	private boolean isLandscape;
+	
+	private TextView    tvTitle;
+	private TextView    tvLocation;
+	private TextView    tvCountdownHours;
+	private TextView    tvCountdownMinutes;
+	private TextView    tvCountdownSeconds;
+	private ProgressBar progressBar;
+	private TextView    tvCurrentTime;
+	private TextView    tvNextTimingLabel;
+	private TextView    tvNextTiming;
+	private TextView    tvFajrTiming;
+	private TextView    tvDuhrTiming;
+	private TextView    tvAsrTiming;
+	private TextView    tvMagribTiming;
+	private TextView    tvIshaTiming;
+	
+	private MainActivityState state;
+	
+	{
+		state = (MainActivityState) ActivityState.stateOf(MainActivity.class);
+		
+		if (state == null) {
+			state = new MainActivityState(MainActivity.class);
+		}
+		
+		state.bindActivity(this);
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +72,100 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		tvTitle             = findViewById(R.id.textViewTitle);
+		tvLocation          = findViewById(R.id.textViewCountdownLocation);
+		tvCountdownHours    = findViewById(R.id.textViewCountdownHours);
+		tvCountdownMinutes  = findViewById(R.id.textViewCountdownMinutes);
+		tvCountdownSeconds  = findViewById(R.id.textViewCountdownSeconds);
+		progressBar         = findViewById(R.id.progressBar);
+		tvCurrentTime       = findViewById(R.id.textViewCurrentTime);
+		tvNextTimingLabel   = findViewById(R.id.textViewTimeTillNextTimingLabel);
+		tvNextTiming        = findViewById(R.id.textViewTimeTillNextTiming);
+		tvFajrTiming        = findViewById(R.id.textViewFajrTiming);
+		tvDuhrTiming        = findViewById(R.id.textViewDuhrTiming);
+		tvAsrTiming         = findViewById(R.id.textViewAsrTiming);
+		tvMagribTiming      = findViewById(R.id.textViewMagribTiming);
+		tvIshaTiming        = findViewById(R.id.textViewIshaaTiming);
+		
 		adjustViewsBasedOnTheme();
 		
 		addListeners();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		state.unbindActivity();
+		super.onDestroy();
+	}
+	
+	protected void updateViewData(CountdownViewModel viewModel) {
+		LocalDateTime now = LocalDateTime.now();
+		
+		if (viewModel != null) {
+			if (viewModel.isDataAvailable()) {
+				tvTitle.setText(viewModel.isEvening ? R.string.time_until_fasting : R.string.time_until_break_fast);
+				tvLocation.setText(viewModel.location);
+				
+				updateCountdown(viewModel, now);
+				
+				tvCurrentTime.setText(CountdownViewModel.getFormattedTime(now));
+				tvNextTimingLabel.setText(String.format("%s %s", getString(R.string.time_till),
+						viewModel.nextPrayer));
+				tvNextTiming.setText(viewModel.getFormattedNextTiming(now));
+				tvFajrTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_FAJR));
+				tvDuhrTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_DUHR));
+				tvAsrTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_ASR));
+				tvMagribTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_MAGRIB));
+				tvIshaTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_ISHA));
+			}
+			else if (viewModel.isDataLoading()) {
+				clearViewData("please wait...");
+			}
+			else if (viewModel.isError()) {
+				switch (viewModel.getError()) {
+					case CountdownViewModel.ERROR_NO_LOCATION:
+						clearViewData(getString(R.string.error_no_location_message));
+						
+					default:
+						clearViewData(getString(R.string.error_unknown_message));
+				}
+			}
+			else {
+				clearViewData("Unknown state");
+			}
+		}
+		else {
+			clearViewData("");
+		}
+	}
+	
+	protected void clearViewData(String title) {
+		tvTitle.setText(title);
+		tvLocation.setText("");
+		tvCountdownHours.setText("--");
+		tvCountdownMinutes.setText("--");
+		tvCountdownSeconds.setText("--");
+		tvCurrentTime.setText("-");
+		tvNextTimingLabel.setText(getString(R.string.time_till_next_timing));
+		tvNextTiming.setText("-");
+		tvFajrTiming.setText("-");
+		tvDuhrTiming.setText("-");
+		tvAsrTiming.setText("-");
+		tvMagribTiming.setText("-");
+		tvIshaTiming.setText("-");
+	}
+	
+	protected void updateCountdown(CountdownViewModel viewModel, LocalDateTime now) {
+		int[] countdown = viewModel.getCurrentCountdown(now);
+		
+		updateCountdownNumbers(countdown);
+		progressBar.setProgress((int) (viewModel.countDownProgress * 100));
+	}
+	
+	protected void updateCountdownNumbers(int[] countdown) {
+		tvCountdownHours.setText(String.valueOf(countdown[0]));
+		tvCountdownMinutes.setText(String.valueOf(countdown[1]));
+		tvCountdownSeconds.setText(String.valueOf(countdown[2]));
 	}
 	
 	protected void addListeners() {
@@ -131,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
 	
 	/**
 	 * Modifies the attributes of this activity's views based on `appTheme`.
-	 *
 	 */
 	private void adjustViewsBasedOnTheme() {
 		final View root = findViewById(isLandscape? R.id.constraintLayoutRoot : R.id.scrollViewRoot);
@@ -189,9 +314,7 @@ public class MainActivity extends AppCompatActivity {
 		TypedValue typedValue = new TypedValue();
 		getResources().getValue(resId, typedValue, true);
 		
-		if (BuildConfig.DEBUG &&
-				typedValue.type >= TypedValue.TYPE_FLOAT) {
-			
+		if (BuildConfig.DEBUG && typedValue.type >= TypedValue.TYPE_FLOAT) {
 			return typedValue.getFloat();
 		}
 		else {
