@@ -3,16 +3,4 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <EditTextPreference
-        app:key="@string/settings_key_country"
-        app:title="@string/country"
-        android:layout="@layout/preference_card"
-        app:useSimpleSummaryProvider="true"/>
-
-    <EditTextPreference
-        app:key="@string/settings_key_city"
-        app:title="@string/city"
-        android:layout="@layout/preference_card"
-        app:useSimpleSummaryProvider="true"/>
-
 </PreferenceScreen>

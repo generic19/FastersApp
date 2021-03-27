@@ -3,11 +3,13 @@ package com.basilalasadi.fasters.view;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
-
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -16,20 +18,19 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.threeten.bp.ZonedDateTime;
 
 import com.basilalasadi.fasters.BuildConfig;
 import com.basilalasadi.fasters.R;
+import com.basilalasadi.fasters.controller.MainActivityController;
 import com.basilalasadi.fasters.model.CountdownViewModel;
 import com.basilalasadi.fasters.state.ActivityState;
 import com.basilalasadi.fasters.state.MainActivityState;
 import com.basilalasadi.fasters.view.settings.SettingsActivity;
 
-import org.threeten.bp.LocalDateTime;
 
-
-public class MainActivity extends AppCompatActivity {
-	private ScrollingGradientBackground scrollingBackground;
-	private boolean isLandscape;
+public class MainActivity extends AppCompatActivity implements MainActivityController {
+	private static final String TAG = "MainActivity";
 	
 	private TextView    tvTitle;
 	private TextView    tvLocation;
@@ -46,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
 	private TextView    tvMagribTiming;
 	private TextView    tvIshaTiming;
 	
+	private ScrollingGradientBackground scrollingBackground;
+	private Handler handler;
+	private boolean isLandscape;
+	
 	private MainActivityState state;
 	
 	{
@@ -55,11 +60,13 @@ public class MainActivity extends AppCompatActivity {
 			state = new MainActivityState(MainActivity.class);
 		}
 		
-		state.bindActivity(this);
+		state.bindController(this);
 	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		MainActivityState.bindApplication(getApplication());
+		
 		isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -72,51 +79,59 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		tvTitle             = findViewById(R.id.textViewTitle);
-		tvLocation          = findViewById(R.id.textViewCountdownLocation);
-		tvCountdownHours    = findViewById(R.id.textViewCountdownHours);
-		tvCountdownMinutes  = findViewById(R.id.textViewCountdownMinutes);
-		tvCountdownSeconds  = findViewById(R.id.textViewCountdownSeconds);
-		progressBar         = findViewById(R.id.progressBar);
-		tvCurrentTime       = findViewById(R.id.textViewCurrentTime);
-		tvNextTimingLabel   = findViewById(R.id.textViewTimeTillNextTimingLabel);
-		tvNextTiming        = findViewById(R.id.textViewTimeTillNextTiming);
-		tvFajrTiming        = findViewById(R.id.textViewFajrTiming);
-		tvDuhrTiming        = findViewById(R.id.textViewDuhrTiming);
-		tvAsrTiming         = findViewById(R.id.textViewAsrTiming);
-		tvMagribTiming      = findViewById(R.id.textViewMagribTiming);
-		tvIshaTiming        = findViewById(R.id.textViewIshaaTiming);
+		tvTitle = findViewById(R.id.textViewTitle);
+		tvLocation = findViewById(R.id.textViewCountdownLocation);
+		tvCountdownHours = findViewById(R.id.textViewCountdownHours);
+		tvCountdownMinutes = findViewById(R.id.textViewCountdownMinutes);
+		tvCountdownSeconds = findViewById(R.id.textViewCountdownSeconds);
+		progressBar = findViewById(R.id.progressBar);
+		tvCurrentTime = findViewById(R.id.textViewCurrentTime);
+		tvNextTimingLabel = findViewById(R.id.textViewTimeTillNextTimingLabel);
+		tvNextTiming = findViewById(R.id.textViewTimeTillNextTiming);
+		tvFajrTiming = findViewById(R.id.textViewFajrTiming);
+		tvDuhrTiming = findViewById(R.id.textViewDuhrTiming);
+		tvAsrTiming = findViewById(R.id.textViewAsrTiming);
+		tvMagribTiming = findViewById(R.id.textViewMagribTiming);
+		tvIshaTiming = findViewById(R.id.textViewIshaaTiming);
+		
+		
+		handler = new Handler(new HandlerCallback());
 		
 		adjustViewsBasedOnTheme();
 		
 		addListeners();
+		
+		Log.d(TAG, "onCreate: created hours tv " + tvCountdownHours.hashCode() + ".");
 	}
 	
 	@Override
-	protected void onDestroy() {
-		state.unbindActivity();
-		super.onDestroy();
+	public Context getCurrentContext() {
+		return this;
 	}
 	
-	protected void updateViewData(CountdownViewModel viewModel) {
-		LocalDateTime now = LocalDateTime.now();
+	public void updateView() {
+		ZonedDateTime now = ZonedDateTime.now();
+		CountdownViewModel viewModel = state.getViewModel();
 		
 		if (viewModel != null) {
 			if (viewModel.isDataAvailable()) {
 				tvTitle.setText(viewModel.isEvening ? R.string.time_until_fasting : R.string.time_until_break_fast);
 				tvLocation.setText(viewModel.location);
 				
-				updateCountdown(viewModel, now);
+				updateCountdown(now);
+				
+				String[] timings = viewModel.getFormattedTimings();
+				String nextTiming = viewModel.getFormattedNextTiming();
+				String nextTimingLabel = getString(R.string.time_till) + " " + viewModel.nextPrayer;
 				
 				tvCurrentTime.setText(CountdownViewModel.getFormattedTime(now));
-				tvNextTimingLabel.setText(String.format("%s %s", getString(R.string.time_till),
-						viewModel.nextPrayer));
-				tvNextTiming.setText(viewModel.getFormattedNextTiming(now));
-				tvFajrTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_FAJR));
-				tvDuhrTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_DUHR));
-				tvAsrTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_ASR));
-				tvMagribTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_MAGRIB));
-				tvIshaTiming.setText(viewModel.getFormattedTiming(CountdownViewModel.TIMING_ISHA));
+				tvNextTimingLabel.setText(nextTimingLabel);
+				tvNextTiming.setText(nextTiming);
+				tvFajrTiming.setText(timings[0]);
+				tvDuhrTiming.setText(timings[1]);
+				tvAsrTiming.setText(timings[2]);
+				tvMagribTiming.setText(timings[3]);
+				tvIshaTiming.setText(timings[4]);
 			}
 			else if (viewModel.isDataLoading()) {
 				clearViewData("please wait...");
@@ -125,7 +140,12 @@ public class MainActivity extends AppCompatActivity {
 				switch (viewModel.getError()) {
 					case CountdownViewModel.ERROR_NO_LOCATION:
 						clearViewData(getString(R.string.error_no_location_message));
-						
+						break;
+					
+					case CountdownViewModel.ERROR_INVALID_SETTINGS:
+						clearViewData(getString(R.string.invalid_settings));
+						break;
+					
 					default:
 						clearViewData(getString(R.string.error_unknown_message));
 				}
@@ -139,33 +159,48 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 	
+	public Handler getHandler() {
+		return handler;
+	}
+	
 	protected void clearViewData(String title) {
+		progressBar.setProgress(0);
 		tvTitle.setText(title);
 		tvLocation.setText("");
-		tvCountdownHours.setText("--");
-		tvCountdownMinutes.setText("--");
-		tvCountdownSeconds.setText("--");
-		tvCurrentTime.setText("-");
+		tvCountdownHours.setText("00");
+		tvCountdownMinutes.setText("00");
+		tvCountdownSeconds.setText("00");
+		tvCurrentTime.setText("");
 		tvNextTimingLabel.setText(getString(R.string.time_till_next_timing));
-		tvNextTiming.setText("-");
-		tvFajrTiming.setText("-");
-		tvDuhrTiming.setText("-");
-		tvAsrTiming.setText("-");
-		tvMagribTiming.setText("-");
-		tvIshaTiming.setText("-");
+		tvNextTiming.setText("");
+		tvFajrTiming.setText("");
+		tvDuhrTiming.setText("");
+		tvAsrTiming.setText("");
+		tvMagribTiming.setText("");
+		tvIshaTiming.setText("");
 	}
 	
-	protected void updateCountdown(CountdownViewModel viewModel, LocalDateTime now) {
-		int[] countdown = viewModel.getCurrentCountdown(now);
+	public void updateCountdown() {
+		ZonedDateTime now = ZonedDateTime.now();
+		updateCountdown(now);
+	}
+	
+	public void updateCountdown(ZonedDateTime now) {
+		CountdownViewModel viewModel = state.getViewModel();
 		
-		updateCountdownNumbers(countdown);
+		if (viewModel == null || !viewModel.isDataAvailable()) {
+			return;
+		}
+		
+		CountdownViewModel.CountdownDisplay countdown = viewModel.getCountdownDisplay(now);
+		
+		tvCountdownHours.setText(countdown.hours);
+		tvCountdownMinutes.setText(countdown.minute);
+		tvCountdownSeconds.setText(countdown.second);
+		
 		progressBar.setProgress((int) (viewModel.countDownProgress * 100));
-	}
-	
-	protected void updateCountdownNumbers(int[] countdown) {
-		tvCountdownHours.setText(String.valueOf(countdown[0]));
-		tvCountdownMinutes.setText(String.valueOf(countdown[1]));
-		tvCountdownSeconds.setText(String.valueOf(countdown[2]));
+		
+		Log.d(TAG, "updateCountdown: updated hours tv " + tvCountdownHours.hashCode() + ".");
 	}
 	
 	protected void addListeners() {
@@ -314,11 +349,30 @@ public class MainActivity extends AppCompatActivity {
 		TypedValue typedValue = new TypedValue();
 		getResources().getValue(resId, typedValue, true);
 		
-		if (BuildConfig.DEBUG && typedValue.type >= TypedValue.TYPE_FLOAT) {
-			return typedValue.getFloat();
+		if (BuildConfig.DEBUG && typedValue.type != TypedValue.TYPE_FLOAT) {
+			throw new AssertionError("Value is not a float.");
 		}
 		else {
-			throw new AssertionError("Value is not a float.");
+			return typedValue.getFloat();
+		}
+	}
+	
+	
+	private class HandlerCallback implements Handler.Callback {
+		@Override
+		public boolean handleMessage(@NonNull Message msg) {
+			switch (msg.what) {
+				case MainActivityController.MSG_UPDATE_COUNTDOWN:
+					updateCountdown();
+					return true;
+				
+				case MainActivityController.MSG_UPDATE_VIEW:
+					updateView();
+					return true;
+				
+				default:
+					return false;
+			}
 		}
 	}
 }

@@ -19,50 +19,10 @@ import java.util.concurrent.TimeUnit;
  * Business logic component for a countdown activity.
  */
 public class CountdownBloc {
-	/**
-	 * Consumer interface for CountdownBloc.
-	 */
-	public interface StateStreamConsumer {
-		/**
-		 * State handler.
-		 * @param viewModel View model.
-		 */
-		void onState(CountdownViewModel viewModel);
-	}
-	
-	
-	/**
-	 * Abstract event for which CountdownBloc responds to.
-	 */
-	private static abstract class Event {
-		/**
-		 * @return Unique identifier for type of event.
-		 */
-		abstract int getEventType();
-	}
-	
-	
-	/**
-	 * Event to trigger timings loading.
-	 */
-	public static class LoadTimingsEvent extends Event {
-		Context context;
-		
-		int getEventType() {
-			return EVENT_LOAD_TIMINGS;
-		}
-		
-		public LoadTimingsEvent(Context context) {
-			this.context = context;
-		}
-	}
-	
 	public static final int EVENT_LOAD_TIMINGS = 1;
 	private final Thread thread;
 	private final ArrayBlockingQueue<Event> eventQueue = new ArrayBlockingQueue<>(10);
 	private final StateStreamConsumer consumer;
-	
-	
 	public CountdownBloc(StateStreamConsumer consumer) {
 		this.consumer = consumer;
 		
@@ -83,19 +43,20 @@ public class CountdownBloc {
 					}
 				}
 			}
-			catch (InterruptedException ignored) {}
+			catch (InterruptedException ignored) {
+			}
 		};
 		
 		this.thread = new Thread(handler);
 		this.thread.start();
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		this.thread.interrupt();
 		super.finalize();
 	}
-	
+
 	public void addEvent(Event event) throws IllegalStateException {
 		this.eventQueue.add(event);
 	}
@@ -174,16 +135,18 @@ public class CountdownBloc {
 		double[] timings;
 		
 		if (useFixedTimeOffset) {
-			timings = PrayerTimings.getTimings(fajrAngleDegrees, useShafaiMethod,
-					ishaFixedTimeOffset, daysSinceEpoch, timeZone, longitude, latitude);
+			timings =
+					PrayerTimings.getTimings(fajrAngleDegrees, useShafaiMethod, ishaFixedTimeOffset,
+							daysSinceEpoch, timeZone, longitude, latitude);
 		}
 		else {
-			timings = PrayerTimings.getTimings(fajrAngleDegrees, useShafaiMethod,
-					ishaAngleDegrees, daysSinceEpoch, timeZone, longitude, latitude);
+			timings = PrayerTimings.getTimings(fajrAngleDegrees, useShafaiMethod, ishaAngleDegrees,
+					daysSinceEpoch, timeZone, longitude, latitude);
 		}
 		
-		double nextDayFajrTimming = PrayerTimings.getFajr(fajrAngleDegrees, daysSinceEpoch + 1,
-				timeZone, coords.longitude, coords.latitude);
+		double nextDayFajrTimming =
+				PrayerTimings.getFajr(fajrAngleDegrees, daysSinceEpoch + 1, timeZone,
+						coords.longitude, coords.latitude);
 		
 		double timeNow = now.getHour() + now.getMinute() / 60.0;
 		boolean isEvening = (timeNow < timings[0] || timeNow > timings[3]);
@@ -213,20 +176,31 @@ public class CountdownBloc {
 		}
 		
 		if (nextPrayerIndex == 5) {
-			timeTillNextPrayer = datetimeFromTiming(now, nextDayFajrTimming, 1).toEpochSecond()
-					- now.toEpochSecond();
+			timeTillNextPrayer = datetimeFromTiming(now, nextDayFajrTimming,
+					1).toEpochSecond() - now.toEpochSecond();
 		}
 		else {
-			timeTillNextPrayer = datetimeFromTiming(now, timings[nextPrayerId]).toEpochSecond() - now.toEpochSecond();
+			timeTillNextPrayer = datetimeFromTiming(now,
+					timings[nextPrayerId]).toEpochSecond() - now.toEpochSecond();
 		}
 		
 		int stringId = R.string.loading_lowercase;
 		switch (nextPrayerId) {
-			case 0: stringId = R.string.fajr; break;
-			case 1: stringId = R.string.duhr; break;
-			case 2: stringId = R.string.asr; break;
-			case 3: stringId = R.string.magrib; break;
-			case 4: stringId = R.string.ishaa; break;
+			case 0:
+				stringId = R.string.fajr;
+				break;
+			case 1:
+				stringId = R.string.duhr;
+				break;
+			case 2:
+				stringId = R.string.asr;
+				break;
+			case 3:
+				stringId = R.string.magrib;
+				break;
+			case 4:
+				stringId = R.string.ishaa;
+				break;
 		}
 		
 		nextPrayerName = event.context.getString(stringId);
@@ -235,23 +209,60 @@ public class CountdownBloc {
 		CountdownViewModel viewModel =
 				new CountdownViewModel(CountdownViewModel.FLAG_DATA_AVAILABLE, isEvening,
 						countDownEndTime, (double) countDownStartTime / countDownEndTime,
-						address.city, timeTillNextPrayer, nextPrayerName, timings, nextPrayerId);
+						address.city, timeTillNextPrayer, nextPrayerName, timings, nextPrayerId,
+						timeZone);
 		
 		consumer.onState(viewModel);
 	}
 	
 	private ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time) {
-		int nextDayFajrHour = (int)time;
-		int nextDayFajrMinute = (int)((time - nextDayFajrHour) * 60);
-		int nextDayFajrSecond = (int)((time - nextDayFajrHour - nextDayFajrMinute / 60.0) * 3600);
+		int nextDayFajrHour = (int) time;
+		int nextDayFajrMinute = (int) ((time - nextDayFajrHour) * 60);
+		int nextDayFajrSecond = (int) ((time - nextDayFajrHour - nextDayFajrMinute / 60.0) * 3600);
 		
-		return now
-				.withHour(nextDayFajrHour)
+		return now.withHour(nextDayFajrHour)
 				.withMinute(nextDayFajrMinute)
 				.withSecond(nextDayFajrSecond);
 	}
 	
 	private ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time, int daysOffset) {
 		return datetimeFromTiming(now, time).plusDays(daysOffset);
+	}
+	
+	/**
+	 * Consumer interface for CountdownBloc.
+	 */
+	public interface StateStreamConsumer {
+		/**
+		 * State handler.
+		 *
+		 * @param viewModel View model.
+		 */
+		void onState(CountdownViewModel viewModel);
+	}
+	
+	/**
+	 * Abstract event for which CountdownBloc responds to.
+	 */
+	private static abstract class Event {
+		/**
+		 * @return Unique identifier for type of event.
+		 */
+		abstract int getEventType();
+	}
+	
+	/**
+	 * Event to trigger timings loading.
+	 */
+	public static class LoadTimingsEvent extends Event {
+		Context context;
+		
+		public LoadTimingsEvent(Context context) {
+			this.context = context;
+		}
+		
+		int getEventType() {
+			return EVENT_LOAD_TIMINGS;
+		}
 	}
 }

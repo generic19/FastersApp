@@ -1,10 +1,13 @@
 package com.basilalasadi.fasters.controller;
 
-import com.basilalasadi.fasters.model.CountdownViewModel;
+import android.content.Context;
+import android.os.Handler;
 
 
 public interface MainActivityController {
-	void setViewModel(CountdownViewModel viewModel);
-	void updateViewData();
-	void updateCountdown();
+	int MSG_UPDATE_VIEW = 1;
+	int MSG_UPDATE_COUNTDOWN = 2;
+	
+	Context getCurrentContext();
+	Handler getHandler();
 }

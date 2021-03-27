@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Fasters</string>
     <string name="key_database_version_template">database_%s_version</string>
-    <string name="latest_database_worldcities_version">1</string>
+    <string name="latest_database_worldcities_version">2</string>
 
     <string name="set_location">Set Location</string>
     <string name="city">City</string>
@@ -120,11 +120,13 @@
 
     <string name="isha_calculation_method_value_sun_angle">sun_angle</string>
     <string name="isha_calculation_method_value_time_offset">time_offset</string>
-    <string name="time_until_fasting">Time unil fasting</string>
+    <string name="time_until_fasting">Time until fasting</string>
     <string name="time_till_next_timing">Time till next timing</string>
-    <string name="error_no_location_message">Please set your location</string>
-    <string name="error_unknown_message">An error has occured</string>
+    <string name="error_no_location_message">Please set your location.</string>
+    <string name="error_unknown_message">An error has occurred.</string>
     <string name="loading_lowercase">loading</string>
+    <string name="invalid_settings">Invalid settings.</string>
+    <string name="search">Search</string>
 
 
 </resources>

@@ -1,6 +1,7 @@
 package com.basilalasadi.fasters.math;
 
 import org.threeten.bp.ZonedDateTime;
+import static com.basilalasadi.fasters.math.AstronomyMath.*;
 
 
 @SuppressWarnings({"SpellCheckingInspection", "unused"})
@@ -44,12 +45,12 @@ public abstract class PrayerTimings {
 			case COUNTRY_CANADA:
 			case COUNTRY_MEXICO:
 				return Method.IslamicSocietyOfNorthAmerica;
-				
+			
 			case COUNTRY_OMAN:
 			case COUNTRY_BAHRAIN:
 			case COUNTRY_UNITED_ARAB_EMIRATES:
 				return Method.GulfRegion;
-				
+			
 			case COUNTRY_SAUDI_ARABIA:  return Method.UmmAlQuraUniversityMakkah;
 			case COUNTRY_EGYPT:         return Method.EgyptianGeneralAuthorityOfSurvey;
 			case COUNTRY_IRAN:          return Method.InstituteOfGeophysicsTehran;
@@ -154,14 +155,11 @@ public abstract class PrayerTimings {
 		}
 	}
 	
-	
-	
 	public static double getFajr(double angleDegrees, double daysSinceEpoch, int timeZone, double longitude, double latitude) {
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double offset = noonOffsetFromSunAngle(angleDegrees, daysSinceEpoch, latitude);
 		
-		double offset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(angleDegrees), daysSinceEpoch, latitude);
-		
-		return noon - offset / 60;
+		return noon - offset;
 	}
 	
 	public static double getFajr(Method method, double daysSinceEpoch, int timeZone, double longitude, double latitude) {
@@ -169,47 +167,46 @@ public abstract class PrayerTimings {
 	}
 	
 	public static double getDuhr(double daysSinceEpoch, int timeZone, double longitude) {
-		return AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		return localSolarNoon(daysSinceEpoch, timeZone, longitude);
 	}
 	
 	public static double getAsr(double daysSinceEpoch, int timeZone, double longitude, double latitude,
 			boolean useShafaiMethod) {
 		
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
 		
 		double shadowLength = useShafaiMethod ? 2 : 1;
-		double offset =
-				AstronomyMath.noonOffsetFromShadowLength(shadowLength, daysSinceEpoch, latitude);
+		double offset = noonOffsetFromShadowLength(shadowLength, daysSinceEpoch, latitude);
 		
-		return noon + offset / 60;
+		return noon + offset;
 	}
 	
 	public static double getMagrib(double daysSinceEpoch, int timeZone, double longitude, double latitude) {
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
-		double offset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
-		return noon + offset / 60;
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double offset = noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		return noon + offset;
 	}
 	
 	public static double getIsha(double angleDegrees, double daysSinceEpoch, int timeZone,
 			double longitude, double latitude) {
 		
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
-		double offset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(angleDegrees), daysSinceEpoch, latitude);
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double offset = noonOffsetFromSunAngle(angleDegrees, daysSinceEpoch, latitude);
 		return noon + offset / 60;
 	}
 	
 	public static double getIsha(int offsetFromSunsetMinutes, double daysSinceEpoch, int timeZone,
 			double longitude, double latitude) {
 		
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
-		double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
-		return noon + (magribOffset + offsetFromSunsetMinutes) / 60;
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double magribOffset = noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		return noon + magribOffset + offsetFromSunsetMinutes / 60d;
 	}
 	
 	public static double getIsha(Method method, double daysSinceEpoch, int timeZone,
 			double longitude, double latitude, boolean isRamadan) {
 		
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
 		
 		if (getHasFixedIshaOffset(method)) {
 			return getIsha(getIshaFixedOffset(method, isRamadan), daysSinceEpoch, timeZone, longitude, latitude);
@@ -222,70 +219,49 @@ public abstract class PrayerTimings {
 	public static double[] getTimings(double fajrAngleDegrees, boolean useShafaiMethod, double ishaAngleDegrees,
 			double daysSinceEpoch, int timeZone, double longitude, double latitude) {
 		
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
-		double fajrOffset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(fajrAngleDegrees), daysSinceEpoch, latitude);
-		double asrOffset = AstronomyMath.noonOffsetFromShadowLength(useShafaiMethod ? 2 : 1, daysSinceEpoch, latitude);
-		double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
-		double ishaOffset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(ishaAngleDegrees), daysSinceEpoch, latitude);
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double fajr = noon - noonOffsetFromSunAngle(fajrAngleDegrees, daysSinceEpoch, latitude);
+		double asr = noon + noonOffsetFromShadowLength(useShafaiMethod ? 2 : 1, daysSinceEpoch, latitude);
+		double magrib = noon + noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		double isha = noon + noonOffsetFromSunAngle(ishaAngleDegrees, daysSinceEpoch, latitude);
 		
-		return new double[]{
-				noon - fajrOffset / 60,
-				noon,
-				noon + asrOffset / 60,
-				noon + magribOffset / 60,
-				noon + ishaOffset / 60,
-		};
+		return new double[]{ fajr, noon, asr, magrib, isha };
 	}
 	
 	public static double[] getTimings(double fajrAngleDegrees, boolean useShafaiMethod, int ishaTimeOffsetMinutes,
 			double daysSinceEpoch, int timeZone, double longitude, double latitude) {
 		
-		double noon = AstronomyMath.localSolarNoon(daysSinceEpoch, timeZone, longitude);
-		double fajrOffset = AstronomyMath.noonOffsetFromSunAngle(Math.toRadians(fajrAngleDegrees), daysSinceEpoch, latitude);
-		double asrOffset = AstronomyMath.noonOffsetFromShadowLength(useShafaiMethod ? 2 : 1, daysSinceEpoch, latitude);
-		double magribOffset = AstronomyMath.noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		double noon = localSolarNoon(daysSinceEpoch, timeZone, longitude);
+		double fajr = noon - noonOffsetFromSunAngle(fajrAngleDegrees, daysSinceEpoch, latitude);
+		double asr = noon + noonOffsetFromShadowLength(useShafaiMethod ? 2 : 1, daysSinceEpoch, latitude);
+		double magrib = noon + noonOffsetFromSunAngle(0.833, daysSinceEpoch, latitude);
+		double isha = magrib + ishaTimeOffsetMinutes / 60d;
 		
-		return new double[]{
-				noon - fajrOffset / 60,
-				noon,
-				noon + asrOffset / 60,
-				noon + magribOffset / 60,
-				noon + ishaTimeOffsetMinutes / 60d,
-		};
+		return new double[]{ fajr, noon, asr, magrib, isha };
 	}
 	
 	public static double[] getTimings(Method method, double daysSinceEpoch, int timeZone,
 			double longitude, double latitude, boolean isRamadan, boolean useShafaiMethod) {
 		
+		double fajrAngle = getFajrAngleDegrees(method);
+		
 		if (getHasFixedIshaOffset(method)) {
-			return getTimings(
-					getFajrAngleDegrees(method),
-					useShafaiMethod,
-					getIshaFixedOffset(method, isRamadan),
-					daysSinceEpoch,
-					timeZone,
-					longitude,
-					latitude);
+			int ishaOffset = (int) getIshaFixedOffset(method, isRamadan);
+			return getTimings(fajrAngle, useShafaiMethod, ishaOffset, daysSinceEpoch, timeZone, longitude, latitude);
 		}
 		else {
-			return getTimings(
-					getFajrAngleDegrees(method),
-					useShafaiMethod,
-					getIshaAngleDegrees(method),
-					daysSinceEpoch,
-					timeZone,
-					longitude,
-					latitude);
+			double ishaAngle = getIshaAngleDegrees(method);
+			return getTimings(fajrAngle, useShafaiMethod, ishaAngle, daysSinceEpoch, timeZone, longitude, latitude);
 		}
 	}
 	
 	public static double toDaysSinceEpoch2000(ZonedDateTime date) {
-		return AstronomyMath.daysSinceEpoch(date.getYear(),
+		return daysSinceEpoch(date.getYear(),
 				date.getMonthValue(),
 				date.getDayOfMonth(),
 				date.getHour(),
 				date.getMinute(),
-				date.getOffset().getTotalSeconds() / 60 / 60);
+				date.getOffset().getTotalSeconds() / 3600);
 	}
 	
 	public static double toDaysSinceEpoch2000() {

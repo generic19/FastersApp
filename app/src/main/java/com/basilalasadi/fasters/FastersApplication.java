@@ -12,6 +12,6 @@ public class FastersApplication extends Application {
 		super.onCreate();
 		
 		CitiesDatabase.getInstance(this);
-		SettingsManager.getInstance().initializeSettingsWithDefaults(this);
+		SettingsManager.getInstance().ensureSettingsInitialized(this);
 	}
 }

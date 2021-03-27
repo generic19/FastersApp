@@ -2,6 +2,7 @@ package com.basilalasadi.fasters.provider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -13,7 +14,8 @@ import com.basilalasadi.fasters.database.CitiesDatabase;
  * Singleton class that interfaces app's shared prefernces.
  */
 public final class SettingsManager {
-	public static final String CITY_ADMIN_SEPARATOR = "\u200b, ";
+	public static final String TAG = "SettingsManager";
+	public static final String CITY_ADMIN_SEPARATOR = ", ";
 	
 	private static final SettingsManager instance = new SettingsManager();
 	
@@ -21,40 +23,40 @@ public final class SettingsManager {
 		return instance;
 	}
 	
-	private SettingsManager() {
-	
-	}
+	private SettingsManager() {}
 	
 	/**
 	 * Initializes setttings with default values.
 	 * @param context The current context.
 	 */
 	public synchronized void initializeSettingsWithDefaults(Context context) {
+		Log.d(TAG, "initializeSettingsWithDefaults: called.");
+		
 		SharedPreferences prefs = getPrefs(context);
 		
 		SharedPreferences.Editor editor = prefs.edit();
 		
-		editor.remove(context.getString(R.string.settings_key_country));
-		editor.remove(context.getString(R.string.settings_key_city));
-		editor.remove(context.getString(R.string.settings_key_longitude));
-		editor.remove(context.getString(R.string.settings_key_latitude));
+		editor.remove(context.getString(R.string.settings_key_country))
+		      .remove(context.getString(R.string.settings_key_city))
+		      .remove(context.getString(R.string.settings_key_longitude))
+		      .remove(context.getString(R.string.settings_key_latitude));
 		
-		editor.putString(context.getString(R.string.settings_key_calculation_method),      context.getString(R.string.calculation_method_value_automatic));
-		editor.putString(context.getString(R.string.settings_key_isha_calculation_method), context.getString(R.string.isha_calculation_method_value_sun_angle));
-		editor.putString(context.getString(R.string.settings_key_theme),                   context.getString(R.string.theme_value_automatic));
+		editor.putString(context.getString(R.string.settings_key_calculation_method), context.getString(R.string.calculation_method_value_automatic))
+		      .putString(context.getString(R.string.settings_key_isha_calculation_method), context.getString(R.string.isha_calculation_method_value_sun_angle))
+		      .putString(context.getString(R.string.settings_key_theme), context.getString(R.string.theme_value_automatic));
 		
-		editor.putString(context.getString(R.string.settings_key_fajr_sun_angle),           "15");
-		editor.putString(context.getString(R.string.settings_key_isha_sun_angle),           "19");
-		editor.putString(context.getString(R.string.settings_key_isha_time_offset),         "90");
-		editor.putString(context.getString(R.string.settings_key_ramadan_isha_time_offset), "120");
+		editor.putString(context.getString(R.string.settings_key_fajr_sun_angle), "15")
+		      .putString(context.getString(R.string.settings_key_isha_sun_angle), "19")
+		      .putString(context.getString(R.string.settings_key_isha_time_offset), "90")
+		      .putString(context.getString(R.string.settings_key_ramadan_isha_time_offset), "120");
 		
-		editor.putBoolean(context.getString(R.string.settings_key_shafai_method),              false);
-		editor.putBoolean(context.getString(R.string.settings_key_use_ramadan_offset),         false);
-		editor.putBoolean(context.getString(R.string.settings_key_all_notifications),          true);
-		editor.putBoolean(context.getString(R.string.settings_key_prefast_meal_reminder),      true);
-		editor.putBoolean(context.getString(R.string.settings_key_water_reminder),             true);
-		editor.putBoolean(context.getString(R.string.settings_key_prepare_breakfast_reminder), true);
-		editor.putBoolean(context.getString(R.string.settings_key_breakfast_near_reminder),    true);
+		editor.putBoolean(context.getString(R.string.settings_key_shafai_method), false)
+		      .putBoolean(context.getString(R.string.settings_key_use_ramadan_offset), false)
+		      .putBoolean(context.getString(R.string.settings_key_all_notifications), true)
+		      .putBoolean(context.getString(R.string.settings_key_prefast_meal_reminder), true)
+		      .putBoolean(context.getString(R.string.settings_key_water_reminder), true)
+		      .putBoolean(context.getString(R.string.settings_key_prepare_breakfast_reminder), true)
+		      .putBoolean(context.getString(R.string.settings_key_breakfast_near_reminder), true);
 		
 		editor.putBoolean(context.getString(R.string.settings_key_initialized), true);
 		
@@ -68,7 +70,9 @@ public final class SettingsManager {
 	public synchronized void ensureSettingsInitialized(Context context) {
 		SharedPreferences prefs = getPrefs(context);
 		
-		if (!prefs.getBoolean(context.getString(R.string.settings_key_initialized), false)) {
+		boolean isInitialized = prefs.getBoolean(context.getString(R.string.settings_key_initialized), false);
+		
+		if (!isInitialized) {
 			initializeSettingsWithDefaults(context);
 		}
 	}

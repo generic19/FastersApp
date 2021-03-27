@@ -3,6 +3,7 @@ package com.basilalasadi.fasters.state;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -10,27 +11,111 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 
+@SuppressWarnings("unchecked")
 public abstract class ActivityState<A extends AppCompatActivity> {
-	private static HashMap<Class<? extends AppCompatActivity>, ActivityState<?>> states = new HashMap<>();
+	private static final HashMap<Class<? extends AppCompatActivity>, ActivityState<?>> states = new HashMap<>();
 	
-	protected void onCreateActivity(Bundle savedInstanceState) {}
-	protected void onDestroyActivity() {}
-	protected void onStartActivity() {}
-	protected void onStopActivity() {}
-	protected void onResumeActivity() {}
-	protected void onPauseActivity() {}
-	protected void onSaveInstanceState(Bundle outState) {}
+	private static final Application.ActivityLifecycleCallbacks lifecycleCallback = new Application.ActivityLifecycleCallbacks() {
+		@Override
+		public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+			ActivityState<?> state = stateOf(activity);
+			
+			if (state != null) {
+				state.onCreateActivity(savedInstanceState);
+			}
+		}
+		
+		@Override
+		public void onActivityStarted(@NonNull Activity activity) {
+			ActivityState<?> state = stateOf(activity);
+			if (state != null) {
+				state.onStartActivity();
+			}
+		}
+		
+		@Override
+		public void onActivityResumed(@NonNull Activity activity) {
+			ActivityState<?> state = stateOf(activity);
+			if (state != null) {
+				state.onResumeActivity();
+			}
+		}
+		
+		@Override
+		public void onActivityPaused(@NonNull Activity activity) {
+			ActivityState<?> state = stateOf(activity);
+			if (state != null) {
+				state.onPauseActivity();
+			}
+		}
+		
+		@Override
+		public void onActivityStopped(@NonNull Activity activity) {
+			ActivityState<?> state = stateOf(activity);
+			if (state != null) {
+				state.onStopActivity();
+			}
+		}
+		
+		@Override
+		public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+			ActivityState<?> state = stateOf(activity);
+			if (state != null) {
+				state.onSaveInstanceState(outState);
+			}
+		}
+		
+		@Override
+		public void onActivityDestroyed(@NonNull Activity activity) {
+			ActivityState<?> state = stateOf(activity);
+			if (state != null) {
+				state.onDestroyActivity();
+			}
+		}
+	};
 	
-	private A activity;
+	public static HashSet<Integer> boundApplicationsHashes = new HashSet<>();
+	
+	public static void bindApplication(Application application) {
+		Integer hash = application.hashCode();
+		if (!boundApplicationsHashes.contains(hash)) {
+			application.registerActivityLifecycleCallbacks(lifecycleCallback);
+			boundApplicationsHashes.add(hash);
+		}
+	}
+	
+	public static void unbindApplication(Application application) {
+		Integer hash = application.hashCode();
+		if (boundApplicationsHashes.contains(hash)) {
+			application.unregisterActivityLifecycleCallbacks(lifecycleCallback);
+			boundApplicationsHashes.remove(hash);
+		}
+	}
 	
 	public static <A extends AppCompatActivity> ActivityState<A> stateOf(Class<A> _class) {
 		//noinspection unchecked
 		return (ActivityState<A>) states.get(_class);
 	}
 	
-	public ActivityState(Class<A> _class) {
+	public static <A extends AppCompatActivity> ActivityState<A> stateOf(Activity activity) {
+		//noinspection unchecked
+		return (ActivityState<A>) states.get(activity.getClass());
+	}
+	
+	
+	protected abstract void onCreateActivity(Bundle savedInstanceState);
+	protected abstract void onDestroyActivity();
+	protected abstract void onStartActivity();
+	protected abstract void onStopActivity();
+	protected abstract void onResumeActivity();
+	protected abstract void onPauseActivity();
+	protected abstract void onSaveInstanceState(Bundle outState);
+	
+	
+	protected ActivityState(Class<A> _class) {
 		onCreateState(_class);
 	}
 	
@@ -41,7 +126,6 @@ public abstract class ActivityState<A extends AppCompatActivity> {
 	
 	@CallSuper
 	protected void onDestroyState() {
-		this.unbindActivity();
 		states.remove(this.getClass());
 	}
 	
@@ -49,55 +133,5 @@ public abstract class ActivityState<A extends AppCompatActivity> {
 	protected void finalize() throws Throwable {
 		onDestroyState();
 		super.finalize();
-	}
-	
-	private final Application.ActivityLifecycleCallbacks lifecycleCallback = new Application.ActivityLifecycleCallbacks() {
-		@Override
-		public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-			onCreateActivity(savedInstanceState);
-		}
-		
-		@Override
-		public void onActivityStarted(@NonNull Activity activity) {
-			onStartActivity();
-		}
-		
-		@Override
-		public void onActivityResumed(@NonNull Activity activity) {
-			onResumeActivity();
-		}
-		
-		@Override
-		public void onActivityPaused(@NonNull Activity activity) {
-			onPauseActivity();
-		}
-		
-		@Override
-		public void onActivityStopped(@NonNull Activity activity) {
-			onStopActivity();
-		}
-		
-		@Override
-		public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-			onSaveInstanceState(outState);
-		}
-		
-		@Override
-		public void onActivityDestroyed(@NonNull Activity activity) {
-			onDestroyActivity();
-			unbindActivity();
-		}
-	};
-	
-	public final void bindActivity(A activity) {
-		this.activity = activity;
-		activity.getApplication().registerActivityLifecycleCallbacks(lifecycleCallback);
-	}
-	
-	public final void unbindActivity() {
-		if (activity != null) {
-			activity.getApplication().unregisterActivityLifecycleCallbacks(lifecycleCallback);
-			activity = null;
-		}
 	}
 }
