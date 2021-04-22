@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.database.CitiesDatabase;
+import com.basilalasadi.fasters.view.AppTheme;
 
 
 /**
@@ -74,6 +75,22 @@ public final class SettingsManager {
 		
 		if (!isInitialized) {
 			initializeSettingsWithDefaults(context);
+		}
+	}
+	
+	public synchronized AppTheme getTheme(Context context) {
+		SharedPreferences prefs = getPrefs(context);
+		
+		String setting = prefs.getString(context.getString(R.string.settings_key_theme), null);
+		
+		if (setting.equals(context.getString(R.string.theme_value_dawn))) {
+			return AppTheme.Morning;
+		}
+		else if (setting.equals(context.getString(R.string.theme_value_dusk))) {
+			return AppTheme.Evening;
+		}
+		else {
+			return null;
 		}
 	}
 	
@@ -157,6 +174,7 @@ public final class SettingsManager {
 	
 	/**
 	 * Sets the address, and sets the location coordinates corresponding to the address.
+	 *
 	 * @param context The corrent context.
 	 * @param address The address of the city.
 	 * @return true on success, false otherwise.
@@ -173,6 +191,27 @@ public final class SettingsManager {
 		
 		setAddress(context, address);
 		setCoordinates(context, new Coordinates(location));
+		
+		return true;
+	}
+	
+	/**
+	 * Sets coordinates and closest address to the coordinates.
+	 *
+	 * @param context Current context.
+	 * @param coordinates The coordinates.
+	 * @return true on success, false otherwise.
+	 */
+	public synchronized boolean setLocation(Context context, Coordinates coordinates) {
+		CitiesDatabase citiesDb = CitiesDatabase.getInstance(context);
+		CitiesDatabase.CountryAdminCity addr = citiesDb.findClosestCountryAdminCity(coordinates.longitude, coordinates.latitude);
+		
+		if (addr == null) {
+			return false;
+		}
+		
+		setAddress(context, new Address(addr.country, addr.admin, addr.city));
+		setCoordinates(context, coordinates);
 		
 		return true;
 	}

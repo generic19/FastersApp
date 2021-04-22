@@ -1,7 +1,6 @@
 package com.basilalasadi.fasters.state;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
@@ -15,6 +14,7 @@ import com.basilalasadi.fasters.bloc.CountdownBloc.LoadTimingsEvent;
 import com.basilalasadi.fasters.bloc.CountdownBloc.StateStreamConsumer;
 import com.basilalasadi.fasters.controller.MainActivityController;
 import com.basilalasadi.fasters.model.CountdownViewModel;
+import com.basilalasadi.fasters.provider.TimeProvider;
 import com.basilalasadi.fasters.view.MainActivity;
 
 
@@ -54,7 +54,7 @@ public class MainActivityState extends ActivityState<MainActivity> implements St
 		Log.d("MainActivityState", "activity start.");
 		
 		if (viewModel == null || !viewModel.isDataAvailable()) {
-			bloc.addEvent(new LoadTimingsEvent(controller.getCurrentContext()));
+			sendLoadTimingsEvent();
 		}
 		else {
 			sendUpdateView();
@@ -81,6 +81,10 @@ public class MainActivityState extends ActivityState<MainActivity> implements St
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		Log.d("MainActivityState", "activity save instance.");
+	}
+	
+	void sendLoadTimingsEvent() {
+		bloc.addEvent(new LoadTimingsEvent(controller.getCurrentContext()));
 	}
 	
 	@Override
@@ -143,7 +147,12 @@ public class MainActivityState extends ActivityState<MainActivity> implements St
 		@Override
 		public void run() {
 			try {
-				state.sendUpdateCountdown();
+				if (state.getViewModel().isExpired()) {
+					state.sendLoadTimingsEvent();
+				}
+				else {
+					state.sendUpdateCountdown();
+				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();

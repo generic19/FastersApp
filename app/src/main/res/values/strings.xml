@@ -127,6 +127,8 @@
     <string name="loading_lowercase">loading</string>
     <string name="invalid_settings">Invalid settings.</string>
     <string name="search">Search</string>
+    <string name="location_permission_rationale">Your location will not be sent anywhere. The app will calculate the timings locally, and will cross reference your location with a built-in database to determine the closest city to you.</string>
+    <string name="access_your_general_location">Access your general location</string>
 
 
 </resources>

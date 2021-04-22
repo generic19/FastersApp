@@ -40,7 +40,7 @@
             android:background="@drawable/circle_shape"
             android:indeterminate="false"
             android:indeterminateOnly="false"
-            android:max="100"
+            android:max="180"
             android:progress="0"
             android:progressDrawable="@drawable/circular_progress_bar"
             app:layout_constraintDimensionRatio="1"

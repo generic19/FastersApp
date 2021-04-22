@@ -6,6 +6,7 @@ import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.math.PrayerTimings;
 import com.basilalasadi.fasters.model.CountdownViewModel;
 import com.basilalasadi.fasters.provider.SettingsManager;
+import com.basilalasadi.fasters.provider.TimeProvider;
 
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.chrono.HijrahDate;
@@ -81,7 +82,7 @@ public class CountdownBloc {
 			return;
 		}
 		
-		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime now = TimeProvider.getDateTime();
 		HijrahDate hijriDate = HijrahDate.from(now);
 		boolean isRamadan = hijriDate.get(ChronoField.MONTH_OF_YEAR) == 9;
 		
@@ -144,12 +145,17 @@ public class CountdownBloc {
 					daysSinceEpoch, timeZone, longitude, latitude);
 		}
 		
-		double nextDayFajrTimming =
+		double nextDayFajrTiming =
 				PrayerTimings.getFajr(fajrAngleDegrees, daysSinceEpoch + 1, timeZone,
 						coords.longitude, coords.latitude);
 		
-		double timeNow = now.getHour() + now.getMinute() / 60.0;
+		double lastDayMagribTiming =
+				PrayerTimings.getMagrib(daysSinceEpoch - 1, timeZone, coords.longitude, coords.latitude);
+		
+		
+		double timeNow = now.getHour() + now.getMinute() / 60.0 + now.getSecond() / 3600.0;
 		boolean isEvening = (timeNow < timings[0] || timeNow > timings[3]);
+		
 		
 		int nextPrayerIndex = 5;
 		for (int i = 0; i < 5; i++) {
@@ -166,17 +172,21 @@ public class CountdownBloc {
 		long timeTillNextPrayer;
 		String nextPrayerName;
 		
-		if (isEvening) {
-			countDownStartTime = datetimeFromTiming(now, timings[3]).toEpochSecond();
-			countDownEndTime = datetimeFromTiming(now, nextDayFajrTimming, 1).toEpochSecond();
+		if (timeNow < timings[0]) {
+			countDownStartTime = datetimeFromTiming(now, lastDayMagribTiming, -1).toEpochSecond();
+			countDownEndTime = datetimeFromTiming(now, timings[0]).toEpochSecond();
+		}
+		else if (timeNow < timings[3]) {
+			countDownStartTime = datetimeFromTiming(now, timings[0]).toEpochSecond();;
+			countDownEndTime = datetimeFromTiming(now, timings[3]).toEpochSecond();
 		}
 		else {
-			countDownStartTime = datetimeFromTiming(now, timings[0]).toEpochSecond();
-			countDownEndTime = datetimeFromTiming(now, timings[3]).toEpochSecond();
+			countDownStartTime = datetimeFromTiming(now, timings[3]).toEpochSecond();
+			countDownEndTime = datetimeFromTiming(now, nextDayFajrTiming, 1).toEpochSecond();
 		}
 		
 		if (nextPrayerIndex == 5) {
-			timeTillNextPrayer = datetimeFromTiming(now, nextDayFajrTimming,
+			timeTillNextPrayer = datetimeFromTiming(now, nextDayFajrTiming,
 					1).toEpochSecond() - now.toEpochSecond();
 		}
 		else {
@@ -205,24 +215,31 @@ public class CountdownBloc {
 		
 		nextPrayerName = event.context.getString(stringId);
 		
+		ZonedDateTime expiry;
+		
+		if (nextPrayerIndex == 5) {
+			expiry = datetimeFromTiming(now, 0, 1);
+		}
+		else {
+			expiry = datetimeFromTiming(now, timings[nextPrayerIndex]);
+		}
+		
 		
 		CountdownViewModel viewModel =
-				new CountdownViewModel(CountdownViewModel.FLAG_DATA_AVAILABLE, isEvening,
-						countDownEndTime, (double) countDownStartTime / countDownEndTime,
-						address.city, timeTillNextPrayer, nextPrayerName, timings, nextPrayerId,
-						timeZone);
+				new CountdownViewModel(CountdownViewModel.FLAG_DATA_AVAILABLE, isEvening, countDownStartTime, countDownEndTime, address.city,
+						timeTillNextPrayer, nextPrayerName, timings, nextPrayerId, timeZone, expiry);
 		
 		consumer.onState(viewModel);
 	}
 	
 	private ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time) {
-		int nextDayFajrHour = (int) time;
-		int nextDayFajrMinute = (int) ((time - nextDayFajrHour) * 60);
-		int nextDayFajrSecond = (int) ((time - nextDayFajrHour - nextDayFajrMinute / 60.0) * 3600);
+		int hour = (int) time;
+		int minute = (int) ((time - hour) * 60);
+		int second = (int) ((time - hour - minute / 60.0) * 3600);
 		
-		return now.withHour(nextDayFajrHour)
-				.withMinute(nextDayFajrMinute)
-				.withSecond(nextDayFajrSecond);
+		return now.withHour(hour)
+				.withMinute(minute)
+				.withSecond(second);
 	}
 	
 	private ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time, int daysOffset) {

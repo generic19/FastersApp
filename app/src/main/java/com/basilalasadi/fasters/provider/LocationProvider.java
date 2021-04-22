@@ -2,6 +2,7 @@ package com.basilalasadi.fasters.provider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -27,44 +28,34 @@ public abstract class LocationProvider {
 		void onLocationResult(LocationResult result);
 	}
 	
-	/**
-	 * Uses system's location service to get geolocation.
-	 *
-	 * Possible error states are:
-	 *     ERROR_NO_PROVIDERS when there aren't any available location providers.
-	 *     ERROR_PERMISSION when location permission is denied.
-	 *     ERROR_NO_LOCATION when the location provider returns no location
-	 *     ERROR_EXECUTION when a concurrent error occurs.
-	 *
-	 * @return Location result.
-	 */
-	public static LocationResult getLocation(PermissionsActivity activity) {
-		return getLocation(activity, false);
-	}
+//	/**
+//	 * Uses system's location service to get geolocation.
+//	 *
+//	 * Possible error states are:
+//	 *     ERROR_NO_PROVIDERS when there aren't any available location providers.
+//	 *     ERROR_PERMISSION when location permission is denied.
+//	 *     ERROR_NO_LOCATION when the location provider returns no location
+//	 *     ERROR_EXECUTION when a concurrent error occurs.
+//	 *
+//	 * @return Location result.
+//	 */
+//	public static LocationResult getLocation(PermissionsActivity activity) {
+//		return getLocation(activity, false);
+//	}
 	
 	/**
-	 * Uses system's location service to get geolocation.
+	 * Uses system's location service to get device's coarse location. Assumes that coarse location permission is granted.
 	 *
 	 * Possible error states are:
 	 *     ERROR_NO_PROVIDERS when there aren't any available location providers.
-	 *     ERROR_PERMISSION when location permission is denied.
-	 *     ERROR_NO_LOCATION when the location provider returns no location
-	 *     ERROR_EXECUTION when a concurrent error occurs.
+	 *     ERROR_NO_LOCATION when the location provider returns no location.
 	 *     ERROR_NETWORK when geo-coding fails due to network error.
 	 *
+	 * @param context current context.
 	 * @return Location result.
 	 */
-	public static LocationResult getLocation(PermissionsActivity activity, boolean includeAddress) {
-		try {
-			if (!ensureLocationPermission(activity)) {
-				return new LocationResult(LocationResult.ERROR_PERMISSION);
-			}
-		}
-		catch (InterruptedException e) {
-			return new LocationResult(LocationResult.ERROR_INTERRUPTED);
-		}
-		
-		LocationManager locationManager = (LocationManager) activity.getSystemService(LOCATION_SERVICE);
+	public static LocationResult getLocationNoCheck(Context context) {
+		LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
 		
 		assert locationManager != null;
 		
@@ -88,109 +79,171 @@ public abstract class LocationProvider {
 		if (geoLocation == null) {
 			return new LocationResult(LocationResult.ERROR_NO_LOCATION);
 		}
-		
-		if (!includeAddress) {
+		else {
 			return new LocationResult(geoLocation);
 		}
-		else {
+	}
+	
+	public static void getLocationNoCheck(Context context, OnLocationResultCallback callback) {
+		AppExecutors.ioExecutor.execute(() -> {
 			try {
-				Geocoder geocoder = new Geocoder(activity.getApplicationContext());
-				
-				List<Address> addresses = geocoder.getFromLocation(geoLocation.getLatitude(), geoLocation.getLongitude(), 1);
-				
-				if (addresses == null || addresses.isEmpty()) {
-					return new LocationResult(geoLocation);
-				} else {
-					Address address = addresses.get(0);
-					String addressString = String.format("%s, %s", address.getAdminArea(), address.getCountryName());
-					return new LocationResult(addressString, geoLocation);
-				}
-			} catch (IOException e) {
-				return new LocationResult(LocationResult.ERROR_NETWORK);
+				callback.onLocationResult(getLocationNoCheck(context));
 			}
-		}
-	}
-	
-	/**
-	 * Executes {@link #getLocation(PermissionsActivity)} asynchronously.
-	 *
-	 * @return Future to location result.
-	 */
-	public static Future<LocationResult> getLocationAsync(PermissionsActivity activity) {
-		return AppExecutors.ioExecutor.submit(() -> getLocation(activity));
-	}
-	
-	/**
-	 * Executes {@link #getLocation(PermissionsActivity, boolean)} asynchronously.
-	 *
-	 * @return Future to location result.
-	 */
-	public static Future<LocationResult> getLocationAsync(PermissionsActivity activity, boolean includeAddress) {
-		return AppExecutors.ioExecutor.submit(() -> getLocation(activity, includeAddress));
-	}
-	
-	/**
-	 * Executes {@link #getLocation(PermissionsActivity)} asynchronously and calls `callback` wih the result.
-	 *
-	 * @param callback The callback to call when location result is available.
-	 */
-	public static void getLocationAsync(PermissionsActivity activity, OnLocationResultCallback callback) {
-		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(getLocation(activity)));
-	}
-	
-	/**
-	 * Executes {@link #getLocation(PermissionsActivity, boolean)} asynchronously and calls `callback` wih the result.
-	 *
-	 * @param callback The callback to call when location result is available.
-	 */
-	public static void getLocationAsync(PermissionsActivity activity, OnLocationResultCallback callback, boolean includeAddress) {
-		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(getLocation(activity, includeAddress)));
-	}
-	
-	protected static String geoLocationToAddress(PermissionsActivity activity, Location geoLocation) throws IOException {
-		Geocoder geocoder = new Geocoder(activity.getApplicationContext());
-		
-		List<Address> addresses = geocoder.getFromLocation(geoLocation.getLatitude(), geoLocation.getLongitude(), 1);
-		
-		if (addresses == null || addresses.isEmpty()) {
-			return null;
-		}
-		else {
-			Address address = addresses.get(0);
-			return String.format("%s, %s", address.getAdminArea(), address.getCountryName());
-		}
-	}
-	
-	@NonNull
-	public static LocationResult locationFromAddress(PermissionsActivity activity, @NonNull String addressString) {
-		Geocoder geocoder = new Geocoder(activity.getApplicationContext());
-		
-		try {
-			List<Address> addresses = geocoder.getFromLocationName(addressString, 1);
-			
-			if (addresses == null || addresses.isEmpty()) {
-				return new LocationResult(LocationResult.ERROR_NO_LOCATION);
+			catch (Exception e) {
+				e.printStackTrace();
 			}
-			else {
-				return new LocationResult(addresses.get(0));
-			}
-		}
-		catch (IOException e) {
-			return new LocationResult(LocationResult.ERROR_NETWORK);
-		}
+		});
 	}
 	
-	public static Future<LocationResult> locationFromAddressAsync(PermissionsActivity activity, String addressString) {
-		return AppExecutors.ioExecutor.submit(() -> locationFromAddress(activity, addressString));
-	}
+//	/**
+//	 * Uses system's location service to get geolocation.
+//	 *
+//	 * Possible error states are:
+//	 *     ERROR_NO_PROVIDERS when there aren't any available location providers.
+//	 *     ERROR_PERMISSION when location permission is denied.
+//	 *     ERROR_NO_LOCATION when the location provider returns no location
+//	 *     ERROR_EXECUTION when a concurrent error occurs.
+//	 *     ERROR_NETWORK when geo-coding fails due to network error.
+//	 *
+//	 * @return Location result.
+//	 */
+//	public static LocationResult getLocation(PermissionsActivity activity, boolean includeAddress) {
+//		try {
+//			if (!ensureLocationPermission(activity)) {
+//				return new LocationResult(LocationResult.ERROR_PERMISSION);
+//			}
+//		}
+//		catch (InterruptedException e) {
+//			return new LocationResult(LocationResult.ERROR_INTERRUPTED);
+//		}
+//
+//		LocationManager locationManager = (LocationManager) activity.getSystemService(LOCATION_SERVICE);
+//
+//		assert locationManager != null;
+//
+//		Criteria criteria = new Criteria();
+//		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+//		criteria.setPowerRequirement(Criteria.POWER_LOW);
+//		criteria.setAltitudeRequired(false);
+//		criteria.setCostAllowed(false);
+//		criteria.setBearingRequired(false);
+//		criteria.setSpeedRequired(false);
+//
+//		String provider = locationManager.getBestProvider(criteria, true);
+//
+//		if (provider == null) {
+//			return new LocationResult(LocationResult.ERROR_NO_PROVIDERS);
+//		}
+//
+//		@SuppressLint("MissingPermission")
+//		Location geoLocation = locationManager.getLastKnownLocation(provider);
+//
+//		if (geoLocation == null) {
+//			return new LocationResult(LocationResult.ERROR_NO_LOCATION);
+//		}
+//
+//		if (!includeAddress) {
+//			return new LocationResult(geoLocation);
+//		}
+//		else {
+//			try {
+//				Geocoder geocoder = new Geocoder(activity.getApplicationContext());
+//
+//				List<Address> addresses = geocoder.getFromLocation(geoLocation.getLatitude(), geoLocation.getLongitude(), 1);
+//
+//				if (addresses == null || addresses.isEmpty()) {
+//					return new LocationResult(geoLocation);
+//				} else {
+//					Address address = addresses.get(0);
+//					String addressString = String.format("%s, %s", address.getAdminArea(), address.getCountryName());
+//					return new LocationResult(addressString, geoLocation);
+//				}
+//			} catch (IOException e) {
+//				return new LocationResult(LocationResult.ERROR_NETWORK);
+//			}
+//		}
+//	}
 	
-	public static void locationFromAddressAsync(PermissionsActivity activity, String addressString, OnLocationResultCallback callback) {
-		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(locationFromAddress(activity, addressString)));
-	}
+//	/**
+//	 * Executes {@link #getLocation(PermissionsActivity)} asynchronously.
+//	 *
+//	 * @return Future to location result.
+//	 */
+//	public static Future<LocationResult> getLocationAsync(PermissionsActivity activity) {
+//		return AppExecutors.ioExecutor.submit(() -> getLocation(activity));
+//	}
 	
-	protected static boolean ensureLocationPermission(PermissionsActivity activity) throws InterruptedException {
-		return activity.ensurePermission(Manifest.permission.ACCESS_COARSE_LOCATION);
-	}
+//	/**
+//	 * Executes {@link #getLocation(PermissionsActivity, boolean)} asynchronously.
+//	 *
+//	 * @return Future to location result.
+//	 */
+//	public static Future<LocationResult> getLocationAsync(PermissionsActivity activity, boolean includeAddress) {
+//		return AppExecutors.ioExecutor.submit(() -> getLocation(activity, includeAddress));
+//	}
+	
+//	/**
+//	 * Executes {@link #getLocation(PermissionsActivity)} asynchronously and calls `callback` wih the result.
+//	 *
+//	 * @param callback The callback to call when location result is available.
+//	 */
+//	public static void getLocationAsync(PermissionsActivity activity, OnLocationResultCallback callback) {
+//		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(getLocation(activity)));
+//	}
+	
+//	/**
+//	 * Executes {@link #getLocation(PermissionsActivity, boolean)} asynchronously and calls `callback` wih the result.
+//	 *
+//	 * @param callback The callback to call when location result is available.
+//	 */
+//	public static void getLocationAsync(PermissionsActivity activity, OnLocationResultCallback callback, boolean includeAddress) {
+//		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(getLocation(activity, includeAddress)));
+//	}
+	
+//	protected static String geoLocationToAddress(PermissionsActivity activity, Location geoLocation) throws IOException {
+//		Geocoder geocoder = new Geocoder(activity.getApplicationContext());
+//
+//		List<Address> addresses = geocoder.getFromLocation(geoLocation.getLatitude(), geoLocation.getLongitude(), 1);
+//
+//		if (addresses == null || addresses.isEmpty()) {
+//			return null;
+//		}
+//		else {
+//			Address address = addresses.get(0);
+//			return String.format("%s, %s", address.getAdminArea(), address.getCountryName());
+//		}
+//	}
+	
+//	@NonNull
+//	public static LocationResult locationFromAddress(PermissionsActivity activity, @NonNull String addressString) {
+//		Geocoder geocoder = new Geocoder(activity.getApplicationContext());
+//
+//		try {
+//			List<Address> addresses = geocoder.getFromLocationName(addressString, 1);
+//
+//			if (addresses == null || addresses.isEmpty()) {
+//				return new LocationResult(LocationResult.ERROR_NO_LOCATION);
+//			}
+//			else {
+//				return new LocationResult(addresses.get(0));
+//			}
+//		}
+//		catch (IOException e) {
+//			return new LocationResult(LocationResult.ERROR_NETWORK);
+//		}
+//	}
+	
+//	public static Future<LocationResult> locationFromAddressAsync(PermissionsActivity activity, String addressString) {
+//		return AppExecutors.ioExecutor.submit(() -> locationFromAddress(activity, addressString));
+//	}
+//
+//	public static void locationFromAddressAsync(PermissionsActivity activity, String addressString, OnLocationResultCallback callback) {
+//		AppExecutors.ioExecutor.submit(() -> callback.onLocationResult(locationFromAddress(activity, addressString)));
+//	}
+//
+//	protected static boolean ensureLocationPermission(PermissionsActivity activity) throws InterruptedException {
+//		return activity.ensurePermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+//	}
 	
 	
 	public static class LocationResult {

@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.basilalasadi.fasters.provider.TimeProvider;
+
 import org.threeten.bp.LocalTime;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -68,61 +70,44 @@ public final class CountdownViewModel {
 	
 	public final int flags;
 	public final boolean isEvening;
+	public final long countDownStartTime;
 	public final long countDownEndTime;
-	public final double countDownProgress;
 	public final String location;
 	public final long timeTillNextPrayer;
 	public final String nextPrayer;
 	public final double[] prayerTimes;
 	public final int nextPrayerTime;
 	public final int zone;
+	public final ZonedDateTime expires;
 	
-	public CountdownViewModel(int flags, boolean isEvening, long countDownEndTime,
-			double countDownProgress, String location, long timeTillNextPrayer, String nextPrayer,
-			double[] prayerTimes, int nextPrayerTime, int zone) {
+	public CountdownViewModel(int flags, boolean isEvening, long countDownStartTime, long countDownEndTime, String location, long timeTillNextPrayer,
+			String nextPrayer, double[] prayerTimes, int nextPrayerTime, int zone, ZonedDateTime expires) {
 		
 		this.flags = flags;
 		this.isEvening = isEvening;
+		this.countDownStartTime = countDownStartTime;
 		this.countDownEndTime = countDownEndTime;
-		this.countDownProgress = countDownProgress;
 		this.location = location;
 		this.timeTillNextPrayer = timeTillNextPrayer;
 		this.nextPrayer = nextPrayer;
 		this.prayerTimes = prayerTimes;
 		this.nextPrayerTime = nextPrayerTime;
 		this.zone = zone;
-	}
-	
-	public CountdownViewModel(Bundle bundle) throws IllegalArgumentException {
-		Bundle b = bundle.getBundle(TAG);
-		
-		if (b == null) {
-			throw new IllegalArgumentException("Bundle does not contain view model data.");
-		}
-		
-		this.flags = b.getInt(KEY_FLAGS);
-		this.isEvening = b.getBoolean(KEY_IS_EVENING);
-		this.countDownEndTime = b.getLong(KEY_COUNT_DOWN_END_TIME);
-		this.countDownProgress = b.getDouble(KEY_COUNT_DOWN_PROGRESS);
-		this.location = b.getString(KEY_LOCATION);
-		this.timeTillNextPrayer = b.getLong(KEY_TIME_TILL_NEXT_PRAYER);
-		this.nextPrayer = b.getString(KEY_NEXT_PRAYER);
-		this.prayerTimes = b.getDoubleArray(KEY_PRAYER_TIMES);
-		this.nextPrayerTime = b.getInt(KEY_NEXT_PRAYER_TIME);
-		this.zone = b.getInt(KEY_ZONE);
+		this.expires = expires;
 	}
 	
 	public CountdownViewModel(int flags) {
 		this.flags = flags;
 		this.isEvening = false;
+		this.countDownStartTime = -1;
 		this.countDownEndTime = -1;
-		this.countDownProgress = -1;
 		this.location = null;
 		this.timeTillNextPrayer = -1;
 		this.nextPrayer = null;
 		this.prayerTimes = null;
 		this.nextPrayerTime = -1;
 		this.zone = 0;
+		this.expires = TimeProvider.getDateTime().minusSeconds(1);
 	}
 	
 	@Override
@@ -161,14 +146,15 @@ public final class CountdownViewModel {
 		buf.append("}");
 		
 		buf.append(", isEvening: ").append(isEvening);
+		buf.append(", countDownStartTime: ").append(countDownStartTime);
 		buf.append(", countDownEndTime: ").append(countDownEndTime);
-		buf.append(", countDownProgress: ").append(countDownProgress);
 		buf.append(", location: ").append(location);
 		buf.append(", timeTillNextPrayer: ").append(timeTillNextPrayer);
 		buf.append(", nextPrayer: ").append(nextPrayer);
 		buf.append(", prayerTimes: ").append(Arrays.toString(prayerTimes));
 		buf.append(", nextPrayerTime: ").append(nextPrayerTime);
 		buf.append(", zone: ").append(zone);
+		buf.append(", expires: ").append(expires);
 		
 		buf.append(")");
 		
@@ -195,26 +181,17 @@ public final class CountdownViewModel {
 		return TIME_FORMATTER_HH_MM_AMPM.format(time);
 	}
 	
-	public void putIntoBundle(Bundle bundle) {
-		Bundle b = new Bundle();
-		
-		b.putInt(KEY_FLAGS, flags);
-		b.putBoolean(KEY_IS_EVENING, isEvening);
-		b.putLong(KEY_COUNT_DOWN_END_TIME, countDownEndTime);
-		b.putDouble(KEY_COUNT_DOWN_PROGRESS, countDownProgress);
-		b.putString(KEY_LOCATION, location);
-		b.putLong(KEY_TIME_TILL_NEXT_PRAYER, timeTillNextPrayer);
-		b.putString(KEY_NEXT_PRAYER, nextPrayer);
-		b.putDoubleArray(KEY_PRAYER_TIMES, prayerTimes);
-		b.putInt(KEY_NEXT_PRAYER_TIME, nextPrayerTime);
-		b.putInt(KEY_ZONE, zone);
-		
-		bundle.putBundle(TAG, b);
+	public double getProgress(ZonedDateTime now) {
+		return (now.toEpochSecond() - countDownStartTime) / (double)(countDownEndTime - countDownStartTime);
 	}
 	
 	public CountdownDisplay getCountdownDisplay(ZonedDateTime now) {
 		int seconds = (int)(countDownEndTime - now.toEpochSecond());
 		return new CountdownDisplay(seconds);
+	}
+	
+	public boolean isExpired() {
+		return !TimeProvider.getDateTime().isBefore(expires);
 	}
 	
 	public String[] getFormattedTimings() {

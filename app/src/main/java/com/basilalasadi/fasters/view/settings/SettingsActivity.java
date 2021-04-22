@@ -4,8 +4,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
@@ -17,7 +19,8 @@ import com.basilalasadi.fasters.view.AppTheme;
 import com.google.android.material.appbar.MaterialToolbar;
 
 
-public class SettingsActivity extends AppCompatActivity implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+public class SettingsActivity extends AppCompatActivity
+		implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 	
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
-		int appTheme = prefs.getInt("app_theme", AppTheme.THEME_MORNING);
+		int appTheme = prefs.getInt("app_theme", AppTheme.THEME_EVENING);
 		
 		switch (appTheme) {
 			case AppTheme.THEME_MORNING:
