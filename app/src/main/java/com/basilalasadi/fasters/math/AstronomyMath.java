@@ -4,14 +4,15 @@ import static java.lang.Math.*;
 
 
 /**
- * Abstract class for calculating the equation of time using the Fourier method. Calculations are
- * valid between year 2000 and 2050, and are accurate up to +/- 3 seconds.
- *
- * Calculations are copied from https://equation-of-time.info/calculating-the-equation-of-time.
+ * <p>
+ * Abstract class for calculating the equation of time using the Fourier method.
+ * </p><p>
+ * Calculations are valid between year 2000 and 2050, and are accurate up to +/- 3 seconds.
+ * </p>
  */
 public abstract class AstronomyMath {
 	/**
-	 * Calculates days since epoch (12 on January 1, 2000 UTC).
+	 * Calculates days since epoch (January 1, 2000 - 00:00 UTC).
 	 *
 	 * @return Days since epoch in UTC.
 	 */
@@ -26,10 +27,15 @@ public abstract class AstronomyMath {
 	}
 	
 	/**
+	 * <p>
 	 * Calculates the equation of time using the Fourier method. Calculation is
 	 * valid between year 2000 and 2050, and accurate up to +/- 3 seconds.
-	 *
-	 * Calculations are copied from https://equation-of-time.info/calculating-the-equation-of-time.
+	 * </p><p>
+	 * Calculations are copied from:
+	 * <a href="https://equation-of-time.info/calculating-the-equation-of-time">
+	 *     https://equation-of-time.info/calculating-the-equation-of-time
+	 * </a>
+	 * </p>
 	 */
 	public static double equationOfTime(double daysSinceEpoch) {
 		int cycle = (int) (daysSinceEpoch / 365.25);
@@ -51,12 +57,16 @@ public abstract class AstronomyMath {
 	}
 	
 	/**
+	 * <p>
 	 * Calculates solar declination angle in radians.
-	 *
+	 * </p>
+	 * <p>
 	 * Citation for the equation used:
-	 * P. I. Cooper, “The absorption of radiation in solar stills”, Solar Energy, vol. 12,
-	 * pp. 333 - 346, 1969.
-	 *
+	 *   <blockquote>
+	 *     P. I. Cooper, “The absorption of radiation in solar stills,” <em>Solar Energy</em>, vol. 12,
+	 *     pp. 333&ndash;346, 1969.
+	 *   </blockquote>
+	 * </p>
 	 * @return Solar declination angle in radians.
 	 */
 	public static double solarDeclination(double daysSinceEpoch) {
@@ -73,10 +83,11 @@ public abstract class AstronomyMath {
 	}
 	
 	/**
+	 * <p>
 	 * Calculates offset from solar noon in hours for a given sun angle.
-	 *
-	 * Equation copied from http://praytimes.org/calculation.
-	 *
+	 * </p><p>
+	 * Equation copied from <a href="http://praytimes.org/calculation">http://praytimes.org/calculation</a>.
+	 * </p>
 	 * @param angleDegrees Angle of the sun in degrees (hour angle at noon is 0 degrees).
 	 * @return Offset from solar noon in hours.
 	 */
@@ -94,16 +105,16 @@ public abstract class AstronomyMath {
 	}
 	
 	/**
+	 * <p>
 	 * Calculates time offset from local solar noon at which the shadow of an object is equal
 	 * to `shadowLength` multiplied by its length.
-	 *
-	 * Equation copied from http://praytimes.org/calculation.
-	 *
+	 * </p><p>
+	 * Equation copied from <a href="http://praytimes.org/calculation">http://praytimes.org/calculation</a>.
+	 * </p>
 	 * @param shadowLength Ratio between an object's shadow and its length.
 	 * @return Time offset from local solar noon.
 	 */
 	public static double noonOffsetFromShadowLength(double shadowLength, double daysSinceEpoch, double latitude) {
-		final double t = shadowLength;
 		final double L = latitude * PI / 180;
 		final double D = solarDeclination(daysSinceEpoch);
 		
