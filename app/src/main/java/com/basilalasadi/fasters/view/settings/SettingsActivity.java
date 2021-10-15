@@ -2,12 +2,9 @@ package com.basilalasadi.fasters.view.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
@@ -41,7 +38,7 @@ public class SettingsActivity extends AppCompatActivity
 		}
 		
 		
-		setContentView(R.layout.settings_activity);
+		setContentView(R.layout.activity_settings);
 		
 		((MaterialToolbar) findViewById(R.id.appBar)).setNavigationOnClickListener(v -> super.onBackPressed());
 		

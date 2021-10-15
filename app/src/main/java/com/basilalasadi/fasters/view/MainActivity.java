@@ -3,15 +3,17 @@ package com.basilalasadi.fasters.view;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
+
+import android.annotation.SuppressLint;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PatternMatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -21,28 +23,33 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import org.threeten.bp.ZonedDateTime;
-import org.threeten.bp.format.DateTimeFormatter;
-import org.threeten.bp.format.DateTimeParseException;
 
 import com.basilalasadi.fasters.BuildConfig;
+import com.basilalasadi.fasters.FastersApplication;
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.controller.MainActivityController;
 import com.basilalasadi.fasters.model.CountdownViewModel;
-import com.basilalasadi.fasters.provider.SettingsManager;
-import com.basilalasadi.fasters.provider.TimeProvider;
+import com.basilalasadi.fasters.logic.ReminderConstants;
+import com.basilalasadi.fasters.logic.settings.SettingsManager;
+import com.basilalasadi.fasters.logic.TimeProvider;
+import com.basilalasadi.fasters.service.ReminderIntent;
+import com.basilalasadi.fasters.service.RemindersService;
 import com.basilalasadi.fasters.state.ActivityState;
 import com.basilalasadi.fasters.state.MainActivityState;
 import com.basilalasadi.fasters.view.settings.SettingsActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class MainActivity extends AppCompatActivity implements MainActivityController {
 	private static final String TAG = "MainActivity";
+	private static final boolean DEBUG_TOOLS = false;
 	
 	private TextView    tvTitle;
 	private TextView    tvLocation;
@@ -59,10 +66,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 	private TextView    tvMagribTiming;
 	private TextView    tvIshaTiming;
 	
+	private AppTheme activityAppTheme = null;
 	private ScrollingGradientBackground scrollingBackground;
 	private Handler handler;
 	private boolean isLandscape;
-	private AppTheme currentApTheme = null;
 	
 	private MainActivityState state;
 	
@@ -80,58 +87,70 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 	protected void onCreate(Bundle savedInstanceState) {
 		MainActivityState.bindApplication(getApplication());
 		
+		// Starts reminders service.
+		{
+			JobScheduler jobScheduler = getSystemService(JobScheduler.class);
+			
+			ComponentName remindersService = new ComponentName(this, RemindersService.class);
+			
+			JobInfo.Builder builder = new JobInfo.Builder(RemindersService.JOB_ID, remindersService);
+			builder.setOverrideDeadline(System.currentTimeMillis() + 15 * 1000);
+			
+			jobScheduler.cancel(RemindersService.JOB_ID);
+			jobScheduler.schedule(builder.build());
+		}
+		
 		isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 		
-		updateAppTheme();
+		setActivityTheme();
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		tvTitle = findViewById(R.id.textViewTitle);
-		tvLocation = findViewById(R.id.textViewCountdownLocation);
-		tvCountdownHours = findViewById(R.id.textViewCountdownHours);
-		tvCountdownMinutes = findViewById(R.id.textViewCountdownMinutes);
-		tvCountdownSeconds = findViewById(R.id.textViewCountdownSeconds);
-		progressBar = findViewById(R.id.progressBar);
-		tvCurrentTime = findViewById(R.id.textViewCurrentTime);
-		tvNextTimingLabel = findViewById(R.id.textViewTimeTillNextTimingLabel);
-		tvNextTiming = findViewById(R.id.textViewTimeTillNextTiming);
-		tvFajrTiming = findViewById(R.id.textViewFajrTiming);
-		tvDuhrTiming = findViewById(R.id.textViewDuhrTiming);
-		tvAsrTiming = findViewById(R.id.textViewAsrTiming);
-		tvMagribTiming = findViewById(R.id.textViewMagribTiming);
-		tvIshaTiming = findViewById(R.id.textViewIshaaTiming);
 		
+		final View root = findViewById(isLandscape? R.id.constraintLayoutRoot : R.id.scrollViewRoot);
+		{
+			final int statusBarHeight = (int) Math.ceil(25 * getResources().getDisplayMetrics().density);
+			
+			final int paddingLeft = root.getPaddingLeft();
+			final int paddingTop = root.getPaddingTop();
+			final int paddingRight = root.getPaddingRight();
+			final int paddingBottom = root.getPaddingBottom();
+			
+			root.setPadding(paddingLeft, paddingTop + statusBarHeight, paddingRight, paddingBottom);
+		}
 		
-		handler = new Handler(new HandlerCallback());
+		tvTitle             = findViewById(R.id.textViewTitle);
+		tvLocation          = findViewById(R.id.textViewCountdownLocation);
+		tvCountdownHours    = findViewById(R.id.textViewCountdownHours);
+		tvCountdownMinutes  = findViewById(R.id.textViewCountdownMinutes);
+		tvCountdownSeconds  = findViewById(R.id.textViewCountdownSeconds);
+		progressBar         = findViewById(R.id.progressBar);
+		tvCurrentTime       = findViewById(R.id.textViewCurrentTime);
+		tvNextTimingLabel   = findViewById(R.id.textViewTimeTillNextTimingLabel);
+		tvNextTiming        = findViewById(R.id.textViewTimeTillNextTiming);
+		tvFajrTiming        = findViewById(R.id.textViewFajrTiming);
+		tvDuhrTiming        = findViewById(R.id.textViewDuhrTiming);
+		tvAsrTiming         = findViewById(R.id.textViewAsrTiming);
+		tvMagribTiming      = findViewById(R.id.textViewMagribTiming);
+		tvIshaTiming        = findViewById(R.id.textViewIshaaTiming);
 		
 		adjustViewsBasedOnTheme();
+		
+		handler = new Handler(new HandlerCallback());
 		
 		addListeners();
 		
 		Log.d(TAG, "onCreate: created hours tv " + tvCountdownHours.hashCode() + ".");
 	}
 	
-	private boolean updateAppTheme() {
-		AppTheme appTheme = SettingsManager.getInstance().getTheme(this);
+	@Override
+	protected void onStart() {
+		super.onStart();
 		
-		if (appTheme == null) {
-			CountdownViewModel viewModel = state.getViewModel();
-			
-			if (viewModel != null && viewModel.isDataAvailable()) {
-				if (viewModel.isEvening) {
-					appTheme = AppTheme.Evening;
-				}
-				else {
-					appTheme = AppTheme.Morning;
-				}
-			}
-			else {
-				appTheme = AppTheme.Evening;
-			}
+		if (setActivityTheme()) {
+			recreate();
 		}
-		
-		return setAppTheme(appTheme);
 	}
 	
 	@Override
@@ -151,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 				updateCountdown(now);
 				
 				String[] timings = viewModel.getFormattedTimings();
-				String nextTimingLabel = getString(R.string.time_till) + " " + viewModel.nextPrayer;
+				String nextTimingLabel = getString(R.string.time_till) + " " + viewModel.nextPrayerName;
 				
 				tvNextTimingLabel.setText(nextTimingLabel);
 				tvFajrTiming.setText(timings[0]);
@@ -160,7 +179,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 				tvMagribTiming.setText(timings[3]);
 				tvIshaTiming.setText(timings[4]);
 				
-				if (updateAppTheme()) {
+				AppTheme appTheme = viewModel.isEvening ? AppTheme.Evening : AppTheme.Morning;
+				
+				if (FastersApplication.get(this).updateTheme(appTheme)) {
 					recreate();
 				}
 			}
@@ -194,10 +215,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		return handler;
 	}
 	
+	@SuppressLint("SetTextI18n")
 	protected void clearViewData(String title) {
 		progressBar.setProgress(0);
 		tvTitle.setText(title);
-		tvLocation.setText("");
+		tvLocation.setText(getString(R.string.countdown_location_initial_text));
 		tvCountdownHours.setText("00");
 		tvCountdownMinutes.setText("00");
 		tvCountdownSeconds.setText("00");
@@ -232,8 +254,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		progressBar.setProgress((int) (viewModel.getProgress(now) * 180));
 		tvCurrentTime.setText(CountdownViewModel.getFormattedTime(now));
 		
-		long nextPrayerHours = viewModel.timeTillNextPrayer / 3600;
-		long nextPrayerMinute = viewModel.timeTillNextPrayer / 60 - nextPrayerHours * 60;
+		long timeTillNextPrayer = viewModel.getTimeTillNextPrayer(now);
+		
+		long nextPrayerHours = timeTillNextPrayer / 3600;
+		long nextPrayerMinute = timeTillNextPrayer / 60 - nextPrayerHours * 60;
 		
 		tvNextTiming.setText(String.format(Locale.US, "%d:%02d", nextPrayerHours, nextPrayerMinute));
 	}
@@ -263,145 +287,118 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 				(View view, int scrollX, int scrollY, int oldScrollX, int oldScrollY) -> scrollingBackground.setScroll(scrollY)
 		);
 		
-		/*
-		 * "Switch Theme" button on-click listener. Switches AppTheme in shared preferences and
-		 * recreates this activity.
-		 */
-		findViewById(R.id.tableLayoutQuickInfo).setOnClickListener((View v) -> {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			
-			int appTheme = prefs.getInt("app_theme", AppTheme.THEME_MORNING);
-			
-			SharedPreferences.Editor editor = prefs.edit();
-			
-			try {
-				if (appTheme == AppTheme.THEME_MORNING) {
-					editor.putInt("app_theme", AppTheme.THEME_EVENING);
-				}
-				else {
-					editor.putInt("app_theme", AppTheme.THEME_MORNING);
-				}
-			}
-			finally {
-				editor.apply();
-			}
-			
-			getWindow().setWindowAnimations(R.style.Window_Transition_ThemeSwitch);
-			
-			recreate();
-		});
-		
 		
 		findViewById(R.id.buttonSettings).setOnClickListener(view -> {
 			Intent intent = new Intent(this, SettingsActivity.class);
-			
 			startActivity(intent);
 		});
 		
-		
-		findViewById(R.id.buttonDebugLaunchActivity).setOnClickListener((View v) -> {
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
-		});
-		
-		findViewById(R.id.buttonExecuteDebugFunction).setOnClickListener(
-				view -> Toast.makeText(this, "No code to run.", Toast.LENGTH_SHORT).show());
-		
-		
-		findViewById(R.id.textViewPrayerTimesLabel).setOnClickListener(view -> {
-			MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-			builder.setTitle("Set date and time");
-			builder.setView(R.layout.dialog_input_datetime);
-			
-			builder.setPositiveButton("Set", (dialog, which) -> {
-				String str = ((EditText) ((AlertDialog)dialog).findViewById(R.id.textbox)).getText().toString();
+		if (DEBUG_TOOLS) {
+			findViewById(R.id.textViewPrayerTimesLabel).setOnClickListener(view -> {
+				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+				builder.setTitle("Set date and time");
+				builder.setView(R.layout.dialog_input_datetime);
 				
-				try {
-					Matcher m = Pattern.compile("(?:(\\d{1,2})/(\\d{1,2})/(\\d{2,4}) )?(\\d+):(\\d+) ([ap])m", Pattern.CASE_INSENSITIVE).matcher(str);
-					
-					if (m.find()) {
-						ZonedDateTime dt = ZonedDateTime.now();
+				builder.setPositiveButton("Set", (dialog, which) -> {
+					try {
+						AlertDialog alertDialog = (AlertDialog) Objects.requireNonNull(dialog);
+						EditText editInput = Objects.requireNonNull(alertDialog.findViewById(R.id.textbox));
+						String str = editInput.getText().toString();
 						
-						if (m.group(1) != null) {
-							int month = Integer.parseInt(m.group(1));
-							int day = Integer.parseInt(m.group(2));
-							int year = Integer.parseInt(m.group(3));
+						Matcher m = Pattern.compile(
+								"(?:(\\d{1,2})/(\\d{1,2})/(\\d{2,4}) )?(\\d+):(\\d+) ([ap])m", Pattern.CASE_INSENSITIVE).matcher(str);
+						
+						if (m.find()) {
+							ZonedDateTime dt = ZonedDateTime.now();
 							
-							if (year < 100) {
-								year += 2000;
+							if (m.group(1) != null) {
+								int month = Integer.parseInt(Objects.requireNonNull(m.group(1)));
+								int day = Integer.parseInt(Objects.requireNonNull(m.group(2)));
+								int year = Integer.parseInt(Objects.requireNonNull(m.group(3)));
+								
+								if (year < 100) {
+									year += 2000;
+								}
+								
+								dt = dt.withYear(year).withMonth(month).withDayOfMonth(day);
 							}
 							
-							dt = dt.withYear(year).withMonth(month).withDayOfMonth(day);
-						}
-						
-						int hour = Integer.parseInt(m.group(4));
-						int minute = Integer.parseInt(m.group(5));
-						boolean pm = m.group(6).toUpperCase().equals("P");
-						
-						if (pm) {
-							if (hour != 12) {
-								hour += 12;
+							int hour = Integer.parseInt(Objects.requireNonNull(m.group(4)));
+							int minute = Integer.parseInt(Objects.requireNonNull(m.group(5)));
+							boolean pm = Objects.requireNonNull(m.group(6)).equalsIgnoreCase("P");
+							
+							if (pm) {
+								if (hour != 12) {
+									hour += 12;
+								}
 							}
+							else {
+								if (hour == 12) {
+									hour = 0;
+								}
+							}
+							
+							dt = dt.withHour(hour).withMinute(minute);
+							
+							TimeProvider.setDateTime(dt);
+							Toast.makeText(this, "Datetime set.", Toast.LENGTH_SHORT).show();
 						}
 						else {
-							if (hour == 12) {
-								hour = 0;
-							}
+							Toast.makeText(this, "Invalid datetime format.", Toast.LENGTH_LONG).show();
 						}
-						
-						dt = dt.withHour(hour).withMinute(minute);
-						
-						TimeProvider.setDateTime(dt);
-						Toast.makeText(this, "Datetime set.", Toast.LENGTH_SHORT).show();
 					}
-					else {
+					catch (Exception e) {
 						Toast.makeText(this, "Invalid datetime format.", Toast.LENGTH_LONG).show();
 					}
-				}
-				catch (Exception e) {
-					Toast.makeText(this, "Invalid datetime format.", Toast.LENGTH_LONG).show();
-				}
+				});
+				
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
 			});
 			
-			AlertDialog alertDialog = builder.create();
-			alertDialog.show();
-		});
+			findViewById(R.id.textViewCurrentTimeLabel).setOnClickListener(view -> {
+				Intent intent = new ReminderIntent(this, ReminderConstants.REMINDER_PREFAST_MEAL, null);
+				sendBroadcast(intent);
+			});
+		}
 	}
 	
-	/**
-	 * Sets the base theme of this activity to the corresponding value of `appTheme`.
-	 *
-	 * @param appTheme The AppTheme to set.
-	 * @return true if appTheme changed, false otherwise.
-	 */
-	private boolean setAppTheme(AppTheme appTheme) {
-		if (currentApTheme != appTheme) {
-			switch (appTheme) {
-				case Evening:
-					setTheme(R.style.Theme_App_Evening);
-					break;
-				
-				case Morning:
-				default:
-					setTheme(R.style.Theme_App_Morning);
+	private boolean setActivityTheme() {
+		final CountdownViewModel viewModel = state.getViewModel();
+		AppTheme appTheme = SettingsManager.getInstance(this).getTheme(this);
+		
+		if (appTheme == null) {
+			if (viewModel != null && viewModel.isDataAvailable() && viewModel.isEvening) {
+				appTheme = AppTheme.Evening;
+				setTheme(R.style.Theme_App_Evening);
 			}
-			
-			currentApTheme = appTheme;
-			
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-			prefs.edit().putInt("app_theme", appTheme.ordinal()).apply();
-			
-			return true;
+			else {
+				appTheme = AppTheme.Morning;
+				setTheme(R.style.Theme_App_Morning);
+			}
 		}
-		return false;
+		
+		
+		switch (appTheme) {
+			case Morning:
+				setTheme(R.style.Theme_App_Morning);
+				break;
+			
+			case Evening:
+				setTheme(R.style.Theme_App_Evening);
+				break;
+		}
+		
+		boolean themeChanged = activityAppTheme != appTheme;
+		activityAppTheme = appTheme;
+		
+		return themeChanged;
 	}
 	
 	/**
 	 * Modifies the attributes of this activity's views based on `appTheme`.
 	 */
 	private void adjustViewsBasedOnTheme() {
-		final View root = findViewById(isLandscape? R.id.constraintLayoutRoot : R.id.scrollViewRoot);
-		
 		int[] firstGradient = new int[]{
 				getColorAttribute(R.attr.colorGradient1Color1),
 				getColorAttribute(R.attr.colorGradient1Color2)
@@ -417,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		
 		scrollingBackground = new ScrollingGradientBackground(firstGradient, secondGradient, extent, parallaxFactor);
 		
+		final View root = getWindow().getDecorView().getRootView();
 		root.setBackground(scrollingBackground);
 	}
 	
@@ -431,15 +429,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		TypedValue typedValue = new TypedValue();
 		getTheme().resolveAttribute(resId, typedValue, true);
 		
-		if (BuildConfig.DEBUG &&
-			typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT &&
-			typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT) {
-			
-			return typedValue.data;
+		if (BuildConfig.DEBUG) {
+			boolean isColor = typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT;
+			if (!isColor) {
+				throw new AssertionError("Value is not a color.");
+			}
 		}
-		else {
-			throw new AssertionError("Value is not a color.");
-		}
+		return typedValue.data;
 	}
 	
 	/**
@@ -461,7 +457,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		}
 	}
 	
-	
+	/**
+	 * Handles messages from MainActivityState
+	 */
 	private class HandlerCallback implements Handler.Callback {
 		@Override
 		public boolean handleMessage(@NonNull Message msg) {

@@ -57,4 +57,15 @@
         <item>@string/isha_calculation_method_value_time_offset</item>
     </string-array>
 
+    <string-array name="prefast_meal_reminer_detail_messages">
+        <item>Whole grains are a long-lasting source of energy that will sustain you the whole day!</item>
+        <item>You need protein! Milk, yogurt, eggs and nuts are some great sources.</item>
+        <item>Healthy fats will give you the energy you need!</item>
+        <item>Combine carbohydrates with protein to get your essential nutrients for the day!</item>
+        <item>No food has all the nutrients you need, so be sure to change it up!</item>
+    </string-array>
+
+
+
+
 </resources>

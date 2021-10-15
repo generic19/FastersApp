@@ -57,29 +57,41 @@ public class SearchableListPreference extends DialogPreference {
 	protected void onAttachedToHierarchy(PreferenceManager preferenceManager) {
 		super.onAttachedToHierarchy(preferenceManager);
 		prefManager = preferenceManager;
+		
+		if (getSummaryProvider() == null) {
+			String text = getText();
+			
+			if (text == null) {
+				setSummary(R.string.not_set);
+			}
+			else {
+				setSummary(text);
+			}
+		}
 	}
 	
 	public static final class SimpleSummaryProvider implements SummaryProvider<SearchableListPreference> {
 		private static SimpleSummaryProvider instance;
-		
+
 		public static SimpleSummaryProvider getInstance() {
 			if (instance == null) {
 				instance = new SimpleSummaryProvider();
 			}
 			return instance;
 		}
-		
+
 		private SimpleSummaryProvider() {}
-		
+
 		@Override
 		public CharSequence provideSummary(SearchableListPreference preference) {
 			String text = preference.getText();
-			
-			if (text == null) {
-				text = preference.getContext().getString(R.string.not_set);
+
+			if (text != null) {
+				return text;
 			}
-			
-			return text;
+			else {
+				return preference.getContext().getString(R.string.not_set);
+			}
 		}
 	}
 }

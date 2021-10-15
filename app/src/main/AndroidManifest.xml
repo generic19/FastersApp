@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="com.basilalasadi.fasters.FastersApplication"
@@ -30,6 +31,19 @@
             android:launchMode="standard"
             android:windowSoftInputMode="adjustResize"
             />
+
+        <service android:name=".service.RemindersService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".service.ReminderPublisher"
+            android:exported="false">
+        </receiver>
 
     </application>
 

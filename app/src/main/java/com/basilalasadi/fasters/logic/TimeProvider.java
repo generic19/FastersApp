@@ -1,4 +1,4 @@
-package com.basilalasadi.fasters.provider;
+package com.basilalasadi.fasters.logic;
 
 
 import org.threeten.bp.LocalDateTime;

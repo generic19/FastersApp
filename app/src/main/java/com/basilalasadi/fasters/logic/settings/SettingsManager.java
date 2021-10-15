@@ -1,4 +1,4 @@
-package com.basilalasadi.fasters.provider;
+package com.basilalasadi.fasters.logic.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,23 +8,113 @@ import androidx.preference.PreferenceManager;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.database.CitiesDatabase;
+import com.basilalasadi.fasters.util.WeakSet;
 import com.basilalasadi.fasters.view.AppTheme;
+
+import static com.basilalasadi.fasters.logic.ReminderConstants.*;
+
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Set;
 
 
 /**
  * Singleton class that interfaces app's shared prefernces.
  */
-public final class SettingsManager {
-	public static final String TAG = "SettingsManager";
-	public static final String CITY_ADMIN_SEPARATOR = ", ";
+public final class SettingsManager implements SharedPreferences.OnSharedPreferenceChangeListener {
 	
-	private static final SettingsManager instance = new SettingsManager();
+	public static final String TAG                   = "SettingsManager";
+	public static final String CITY_ADMIN_SEPARATOR  = ", ";
 	
-	public static SettingsManager getInstance() {
+	private static SettingsManager instance;
+	private final Set<SettingsChangeListener> listeners = new WeakSet<>();
+	private final HashMap<String, WeakSet<ValueListeners.ValueListener>> valueListeners = new HashMap<>();
+	private WeakReference<SharedPreferences> lastPreference = new WeakReference<>(null);
+	
+	
+	public static SettingsManager getInstance(Context context) {
+		if (instance == null) {
+			instance = new SettingsManager(context);
+		}
 		return instance;
 	}
 	
-	private SettingsManager() {}
+	private SettingsManager(Context context) {
+		getPrefs(context);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		SharedPreferences lastPref = lastPreference.get();
+		if (lastPref != null) {
+			lastPref.unregisterOnSharedPreferenceChangeListener(this);
+		}
+	}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		for (SettingsChangeListener listener : listeners) {
+			if (listener != null) {
+				listener.onSettingsChnage(prefs, key);
+			}
+		}
+		
+		WeakSet<ValueListeners.ValueListener> set = this.valueListeners.get(key);
+		
+		if (set != null) {
+			for (ValueListeners.ValueListener listener : set) {
+				if (listener != null) {
+					listener.onChange(prefs, key);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Add a listener to be notified when a setting is changed.
+	 * @param listener listener
+	 */
+	public void addSettingsChangeListener(SettingsChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	/**
+	 * Removes specified listener.
+	 * @param listener listener to remove
+	 */
+	public void removeSettingsChangeListener(SettingsChangeListener listener) {
+		listeners.remove(listener);
+	}
+	
+	/**
+	 * Adds a listener to be notified when the setting with <em>key</em> is changed.
+	 * @param key setting key to watch.
+	 * @param listener implementation of one of the interfaces provided in <em>ValueListeners</em>.
+	 */
+	public void addSettingsValueListener(String key, ValueListeners.ValueListener listener) {
+		WeakSet<ValueListeners.ValueListener> set = valueListeners.get(key);
+		
+		if (set == null) {
+			set = new WeakSet<>();
+			valueListeners.put(key, set);
+		}
+		
+		set.add(listener);
+	}
+	
+	/**
+	 * Removes specified value listener from key.
+	 * @param key setting key
+	 * @param listener the listener to remove
+	 */
+	public void removeSettingsValueListener(String key, ValueListeners.ValueListener listener) {
+		WeakSet<ValueListeners.ValueListener> set = valueListeners.get(key);
+		
+		if (set != null) {
+			set.remove(listener);
+		}
+	}
 	
 	/**
 	 * Initializes setttings with default values.
@@ -78,6 +168,11 @@ public final class SettingsManager {
 		}
 	}
 	
+	/**
+	 * Gets theme setting.
+	 * @param context current context.
+	 * @return AppTheme corresponding to setting, or null if set to automatic.
+	 */
 	public synchronized AppTheme getTheme(Context context) {
 		SharedPreferences prefs = getPrefs(context);
 		
@@ -216,6 +311,15 @@ public final class SettingsManager {
 		return true;
 	}
 	
+	public synchronized void clearLocation(Context context) {
+		getPrefs(context).edit()
+				.remove(context.getString(R.string.settings_key_country))
+				.remove(context.getString(R.string.settings_key_city))
+				.remove(context.getString(R.string.settings_key_longitude))
+				.remove(context.getString(R.string.settings_key_latitude))
+				.apply();
+	}
+	
 	/**
 	 * Gets custom method from settings.
 	 * @param context The current context.
@@ -279,7 +383,30 @@ public final class SettingsManager {
 	 * @return shared preferences instance.
 	 */
 	private SharedPreferences getPrefs(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		ensureRegistered(prefs);
+		return prefs;
+	}
+	
+	/**
+	 * Ensures that the preference change listener is registered in the latest SharedPreferences instance,
+	 * and unregisters the listener from the outdated SharedPreferences instance.
+	 * @param prefs fresh SharedPreferences instance.
+	 */
+	private void ensureRegistered(SharedPreferences prefs) {
+		SharedPreferences oldPrefs = lastPreference.get();
+		
+		if (oldPrefs != null) {
+			if (prefs.hashCode() != oldPrefs.hashCode()) {
+				oldPrefs.unregisterOnSharedPreferenceChangeListener(this);
+				prefs.registerOnSharedPreferenceChangeListener(this);
+				lastPreference = new WeakReference<>(prefs);
+			}
+		}
+		else {
+			prefs.registerOnSharedPreferenceChangeListener(this);
+			lastPreference = new WeakReference<>(prefs);
+		}
 	}
 	
 	/**
@@ -299,7 +426,6 @@ public final class SettingsManager {
 	private long doubleToLong(double val) {
 		return Double.doubleToLongBits(val);
 	}
-	
 	
 	/**
 	 * Container class for city address.
@@ -349,6 +475,44 @@ public final class SettingsManager {
 		}
 	}
 	
+	public int getEnabledReminders(Context context) {
+		SharedPreferences prefs = getPrefs(context);
+		
+		if (prefs.getBoolean(context.getString(R.string.settings_key_all_notifications), false)) {
+			return 0;
+		}
+		
+		int flags = 0;
+		
+		if (prefs.getBoolean(context.getString(R.string.settings_key_prefast_meal_reminder), false)) {
+			flags |= 1 << REMINDER_PREFAST_MEAL;
+		}
+		if (prefs.getBoolean(context.getString(R.string.settings_key_water_reminder), false)) {
+			flags |= 1 << REMINDER_WATER;
+		}
+		if (prefs.getBoolean(context.getString(R.string.settings_key_prepare_breakfast_reminder), false)) {
+			flags |= 1 << REMINDER_PREPARE_BREAKFAST;
+		}
+		if (prefs.getBoolean(context.getString(R.string.settings_key_breakfast_near_reminder), false)) {
+			flags |= 1 << REMINDER_BREAKFAST_CLOSE;
+		}
+		
+		return flags;
+	}
+	
+	public boolean isReminderEnabled(Context context, int reminderIndex) {
+		int keyId;
+		switch (reminderIndex) {
+			case REMINDER_PREFAST_MEAL: keyId = R.string.settings_key_prefast_meal_reminder; break;
+			case REMINDER_WATER: keyId = R.string.settings_key_water_reminder; break;
+			case REMINDER_PREPARE_BREAKFAST: keyId = R.string.settings_key_prepare_breakfast_reminder; break;
+			case REMINDER_BREAKFAST_CLOSE: keyId = R.string.settings_key_breakfast_near_reminder; break;
+			default:
+				throw new IllegalArgumentException("Invalid reminder index.");
+		}
+		
+		return getPrefs(context).getBoolean(context.getString(keyId), false);
+	}
 	
 	/**
 	 * Class containing all necessary values to calculate prayer times.

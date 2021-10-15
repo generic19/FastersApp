@@ -5,8 +5,8 @@ import android.content.Context;
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.math.PrayerTimings;
 import com.basilalasadi.fasters.model.CountdownViewModel;
-import com.basilalasadi.fasters.provider.SettingsManager;
-import com.basilalasadi.fasters.provider.TimeProvider;
+import com.basilalasadi.fasters.logic.settings.SettingsManager;
+import com.basilalasadi.fasters.logic.TimeProvider;
 
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.chrono.HijrahDate;
@@ -24,13 +24,14 @@ public class CountdownBloc {
 	private final Thread thread;
 	private final ArrayBlockingQueue<Event> eventQueue = new ArrayBlockingQueue<>(10);
 	private final StateStreamConsumer consumer;
+	
 	public CountdownBloc(StateStreamConsumer consumer) {
 		this.consumer = consumer;
 		
 		Runnable handler = () -> {
 			try {
 				while (true) {
-					Event event = eventQueue.poll(30, TimeUnit.SECONDS);
+					Event event = eventQueue.poll(60, TimeUnit.SECONDS);
 					
 					if (Thread.currentThread().isInterrupted()) {
 						break;
@@ -63,14 +64,14 @@ public class CountdownBloc {
 	}
 	
 	private void loadTimings(LoadTimingsEvent event) {
-		consumer.onState(new CountdownViewModel(CountdownViewModel.FLAG_DATA_LOADING));
+		consumer.onState(CountdownViewModel.dataLoading());
 		
-		SettingsManager settingsManager = SettingsManager.getInstance();
+		SettingsManager settingsManager = SettingsManager.getInstance(event.context);
 		
 		SettingsManager.Coordinates coords = settingsManager.getCoordinates(event.context);
 		
 		if (coords == null) {
-			consumer.onState(new CountdownViewModel(CountdownViewModel.ERROR_NO_LOCATION));
+			consumer.onState(CountdownViewModel.errorNoLocation());
 			return;
 		}
 		
@@ -78,7 +79,7 @@ public class CountdownBloc {
 		SettingsManager.CustomMethod customMethod = settingsManager.getCustomMethod(event.context);
 		
 		if (address == null || customMethod == null) {
-			consumer.onState(new CountdownViewModel(CountdownViewModel.ERROR_INVALID_SETTINGS));
+			consumer.onState(CountdownViewModel.errorInvalidSettings());
 			return;
 		}
 		
@@ -169,7 +170,6 @@ public class CountdownBloc {
 		
 		long countDownStartTime;
 		long countDownEndTime;
-		long timeTillNextPrayer;
 		String nextPrayerName;
 		
 		if (timeNow < timings[0]) {
@@ -177,21 +177,12 @@ public class CountdownBloc {
 			countDownEndTime = datetimeFromTiming(now, timings[0]).toEpochSecond();
 		}
 		else if (timeNow < timings[3]) {
-			countDownStartTime = datetimeFromTiming(now, timings[0]).toEpochSecond();;
+			countDownStartTime = datetimeFromTiming(now, timings[0]).toEpochSecond();
 			countDownEndTime = datetimeFromTiming(now, timings[3]).toEpochSecond();
 		}
 		else {
 			countDownStartTime = datetimeFromTiming(now, timings[3]).toEpochSecond();
 			countDownEndTime = datetimeFromTiming(now, nextDayFajrTiming, 1).toEpochSecond();
-		}
-		
-		if (nextPrayerIndex == 5) {
-			timeTillNextPrayer = datetimeFromTiming(now, nextDayFajrTiming,
-					1).toEpochSecond() - now.toEpochSecond();
-		}
-		else {
-			timeTillNextPrayer = datetimeFromTiming(now,
-					timings[nextPrayerId]).toEpochSecond() - now.toEpochSecond();
 		}
 		
 		int stringId = R.string.loading_lowercase;
@@ -224,15 +215,19 @@ public class CountdownBloc {
 			expiry = datetimeFromTiming(now, timings[nextPrayerIndex]);
 		}
 		
+		double[] prayerTimes = new double[6];
+		
+		System.arraycopy(timings, 0, prayerTimes, 0, 5);
+		prayerTimes[5] = nextDayFajrTiming;
 		
 		CountdownViewModel viewModel =
 				new CountdownViewModel(CountdownViewModel.FLAG_DATA_AVAILABLE, isEvening, countDownStartTime, countDownEndTime, address.city,
-						timeTillNextPrayer, nextPrayerName, timings, nextPrayerId, timeZone, expiry);
+						nextPrayerIndex, nextPrayerName, prayerTimes, nextPrayerId, timeZone, expiry);
 		
 		consumer.onState(viewModel);
 	}
 	
-	private ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time) {
+	public static ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time) {
 		int hour = (int) time;
 		int minute = (int) ((time - hour) * 60);
 		int second = (int) ((time - hour - minute / 60.0) * 3600);
@@ -242,7 +237,7 @@ public class CountdownBloc {
 				.withSecond(second);
 	}
 	
-	private ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time, int daysOffset) {
+	public static ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time, int daysOffset) {
 		return datetimeFromTiming(now, time).plusDays(daysOffset);
 	}
 	

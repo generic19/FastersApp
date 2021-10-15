@@ -16,29 +16,29 @@
         <SwitchPreference
             app:key="prefast_meal_reminder"
             android:layout="@layout/preference_card"
-            app:title="Pre-fast Meal Reminder"
+            app:title="@string/preference_title_prefast_meal_reminder"
             app:defaultValue="true"
-            android:summary="Reminds you to eat 1 hour before fasting time." />
+            android:summary="@string/preference_summary_prefast_meal_reminder" />
 
         <SwitchPreference
             app:key="water_reminder"
             android:layout="@layout/preference_card"
-            app:title="Water Reminder"
+            app:title="@string/preference_title_water_reminder"
             app:defaultValue="true"
-            android:summary="Reminds you to drink water 15 minutes before fasting time." />
+            android:summary="@string/preference_summary_water_reminder" />
 
         <SwitchPreference
             app:key="prepare_breakfast_reminder"
             android:layout="@layout/preference_card"
-            app:title="Prepare Breakfast Reminder"
-            android:summary="Reminds you to prepare a meal 2 hours before breakfast time." />
+            app:title="@string/preference_title_prepare_breakfast_reminder"
+            android:summary="@string/preference_summary_prepare_breakfast_reminder" />
 
         <SwitchPreference
             app:key="breakfast_near_reminder"
             android:layout="@layout/preference_card"
-            app:title="Breakfast Reminder"
+            app:title="@string/preference_title_breakfast_reminder"
             app:allowDividerBelow="false"
-            android:summary="Reminds you to prepare to eat 15 minutes before breakfast time." />
+            android:summary="@string/preference_summary_breakfast_reminder" />
 
     </PreferenceCategory>
 

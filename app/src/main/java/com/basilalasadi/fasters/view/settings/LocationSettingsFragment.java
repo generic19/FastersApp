@@ -12,8 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.basilalasadi.fasters.R;
-import com.basilalasadi.fasters.provider.LocationProvider;
-import com.basilalasadi.fasters.provider.SettingsManager;
+import com.basilalasadi.fasters.logic.LocationProvider;
+import com.basilalasadi.fasters.logic.settings.SettingsManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 
@@ -140,7 +140,7 @@ public class LocationSettingsFragment extends PreferenceFragmentCompat
         }
         else {
             SettingsManager.Coordinates coordinates = new SettingsManager.Coordinates(result.longitude, result.latitude);
-            boolean success = SettingsManager.getInstance().setLocation(getContext(), coordinates);
+            boolean success = SettingsManager.getInstance(getContext()).setLocation(getContext(), coordinates);
             
             if (!success) {
                 showToast(TOAST_COULD_NOT_SET_LOCATION);

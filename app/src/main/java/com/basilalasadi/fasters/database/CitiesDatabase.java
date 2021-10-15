@@ -5,15 +5,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.os.SystemClock;
-import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.executors.AppExecutors;
-import com.basilalasadi.fasters.provider.SettingsManager;
+import com.basilalasadi.fasters.logic.settings.SettingsManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,7 +65,7 @@ public final class CitiesDatabase {
 		synchronized (mutex) {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 			
-			SettingsManager settingsManager = SettingsManager.getInstance();
+			SettingsManager settingsManager = SettingsManager.getInstance(context);
 			
 			final String versionKey = context.getString(R.string.key_database_version_template, DATABASE_NAME);
 			

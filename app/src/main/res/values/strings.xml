@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Fasters</string>
     <string name="key_database_version_template">database_%s_version</string>
-    <string name="latest_database_worldcities_version">2</string>
+    <string name="latest_database_worldcities_version">3</string>
 
     <string name="set_location">Set Location</string>
     <string name="city">City</string>
@@ -130,5 +130,23 @@
     <string name="location_permission_rationale">Your location will not be sent anywhere. The app will calculate the timings locally, and will cross reference your location with a built-in database to determine the closest city to you.</string>
     <string name="access_your_general_location">Access your general location</string>
 
+    <string name="prefast_meal_reminder_title">Only 1 hour till fasting!</string>
+    <string name="water_reminder_title">15 minutes till fasting! Drink water!</string>
+    <string name="prepare_breakfast_meal_reminder_title">Break-fast in 2 hours. Prepare your meal!</string>
+    <string name="breakfast_reminder_title">Break-fast in 15 minutes!</string>
+
+    <string name="fasting_begins_at_template">Fasting today will begin at %s.</string>
+    <string name="breakfast_at_template">Break-fast today will be at %s.</string>
+
+    <string name="tap_to_see_countdown">Tap here to see a countdown!</string>
+    <string name="preference_title_prefast_meal_reminder">Pre-fast Meal Reminder</string>
+    <string name="preference_title_water_reminder">Water Reminder</string>
+    <string name="preference_title_prepare_breakfast_reminder">Prepare Breakfast Reminder</string>
+    <string name="preference_title_breakfast_reminder">Breakfast Reminder</string>
+    <string name="preference_summary_prefast_meal_reminder">Reminds you to eat 1 hour before fasting time.</string>
+    <string name="preference_summary_water_reminder">Reminds you to drink water 15 minutes before fasting time.</string>
+    <string name="preference_summary_prepare_breakfast_reminder">Reminds you to prepare a meal 2 hours before breakfast time.</string>
+    <string name="preference_summary_breakfast_reminder">Reminds you to prepare to eat 15 minutes before breakfast time.</string>
+    <string name="countdown_location_initial_text">countdown</string>
 
 </resources>

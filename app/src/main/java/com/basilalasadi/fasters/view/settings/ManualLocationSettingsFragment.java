@@ -11,17 +11,16 @@ import androidx.preference.PreferenceScreen;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.database.CitiesDatabase;
-import com.basilalasadi.fasters.provider.SettingsManager;
+import com.basilalasadi.fasters.executors.AppExecutors;
+import com.basilalasadi.fasters.logic.settings.SettingsManager;
 import com.basilalasadi.fasters.util.ArrayAdapterWithFuzzyFilter;
 
-import java.util.Objects;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 
 public class ManualLocationSettingsFragment extends PreferenceFragmentCompat {
 	private static final String TAG = "Autocomplete";
-	private final Executor executor = Executors.newSingleThreadExecutor();
+	private final Executor executor = AppExecutors.cpuExecutor;
 	
 	private String keyCountry;
 	private String keyCity;
@@ -29,8 +28,6 @@ public class ManualLocationSettingsFragment extends PreferenceFragmentCompat {
 	private SearchableListPreference cityPreference;
 	private ArrayAdapterWithFuzzyFilter<String> countryAdapter;
 	private ArrayAdapterWithFuzzyFilter<String> cityAdapter;
-	private CountryPreferenceChangeListener countryChangeListener;
-	private CityPreferenceChangeListener cityChangeListener;
 	
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -42,6 +39,21 @@ public class ManualLocationSettingsFragment extends PreferenceFragmentCompat {
 		
 		executor.execute(() -> {
 			countryAdapter.addAll(CitiesDatabase.getInstance(getContext()).getCountries());
+			
+			String country = countryPreference.getText();
+			
+			if (country != null && !country.isEmpty()) {
+				CitiesDatabase.AdminCity[] adminCities = CitiesDatabase.getInstance(getContext()).getCountryAdminCities(country);
+				
+				String[] options = new String[adminCities.length];
+				
+				for (int i = 0; i < adminCities.length; i++) {
+					options[i] = adminCities[i].city + SettingsManager.CITY_ADMIN_SEPARATOR + adminCities[i].admin;
+				}
+				
+				cityAdapter.clear();
+				cityAdapter.addAll(options);
+			}
 		});
 		
 		setPreferencesFromResource(R.xml.manual_location_settings, rootKey);
@@ -50,11 +62,13 @@ public class ManualLocationSettingsFragment extends PreferenceFragmentCompat {
 		countryPreference = new SearchableListPreference(getContext(), R.string.settings_key_country, R.string.country);
 		cityPreference = new SearchableListPreference(getContext(), R.string.settings_key_city, R.string.city);
 		
-		countryChangeListener = new CountryPreferenceChangeListener();
-		cityChangeListener = new CityPreferenceChangeListener();
+		CountryPreferenceChangeListener countryChangeListener = new CountryPreferenceChangeListener();
+		CityPreferenceChangeListener cityChangeListener = new CityPreferenceChangeListener();
 		
 		countryPreference.setOnPreferenceChangeListener(countryChangeListener);
 		cityPreference.setOnPreferenceChangeListener(cityChangeListener);
+		
+		cityPreference.setSummaryProvider(null);
 		
 		prefScreen.addPreference(countryPreference);
 		prefScreen.addPreference(cityPreference);
@@ -93,11 +107,11 @@ public class ManualLocationSettingsFragment extends PreferenceFragmentCompat {
 		
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			SearchableListPreference pref = (SearchableListPreference) preference;
-			
-			Log.d(TAG, "country changed to " + pref.getText() + ".");
 			cityAdapter.clear();
+			SettingsManager.getInstance(requireContext()).clearLocation(requireContext());
+			
 			cityPreference.setText(null);
+			cityPreference.setSummary(R.string.not_set);
 			
 			executor.execute(() -> {
 				CitiesDatabase.AdminCity[] adminCities = CitiesDatabase.getInstance(getContext()).getCountryAdminCities((String) newValue);
@@ -138,7 +152,23 @@ public class ManualLocationSettingsFragment extends PreferenceFragmentCompat {
 			String city = cityAdminArray[0];
 			String admin = cityAdminArray[1];
 			
-			return SettingsManager.getInstance().setLocation(getContext(), new SettingsManager.Address(country, admin, city));
+			boolean locationSet = SettingsManager.getInstance(getContext())
+					.setLocation(getContext(), new SettingsManager.Address(country, admin, city));
+			
+			if (locationSet) {
+				String text = cityPreference.getText();
+				
+				if (text == null) {
+					cityPreference.setSummary(R.string.not_set);
+				}
+				else {
+					cityPreference.setSummary(text);
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 }

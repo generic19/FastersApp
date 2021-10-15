@@ -94,7 +94,6 @@ class ScrollingGradientBackground extends Drawable {
 	public void draw(@NonNull Canvas canvas) {
 		Rect bounds = getBounds();
 		
-		
 		int[] gradientColors = new int[firstGradient.length];
 		
 		int factor = 256 * (int)(scroll * parallaxFactor) / bounds.height();

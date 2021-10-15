@@ -14,7 +14,6 @@ import com.basilalasadi.fasters.bloc.CountdownBloc.LoadTimingsEvent;
 import com.basilalasadi.fasters.bloc.CountdownBloc.StateStreamConsumer;
 import com.basilalasadi.fasters.controller.MainActivityController;
 import com.basilalasadi.fasters.model.CountdownViewModel;
-import com.basilalasadi.fasters.provider.TimeProvider;
 import com.basilalasadi.fasters.view.MainActivity;
 
 

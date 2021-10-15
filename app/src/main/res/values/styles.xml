@@ -1,6 +1,7 @@
 <resources>
 
-    <style name="Theme" />
+
+    <!-- Themes -->
 
     <style name="Theme.App" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
@@ -8,7 +9,6 @@
     </style>
 
     <style name="Theme.App.Morning">
-
         <item name="colorPrimary">@color/colorSunset1</item>
         <item name="colorPrimaryDark">@color/colorSunset2</item>
         <item name="colorAccent">#00B0FF</item>
@@ -35,11 +35,9 @@
         <item name="colorInactiveSwitchBackground">@color/colorLighterGrey</item>
         <item name="colorSeparator">@color/colorPalePink</item>
         <item name="colorCaption">@color/colorRoomTemperatureDarkGrey</item>
-
     </style>
 
     <style name="Theme.App.Evening">
-
         <item name="colorPrimary">@color/colorDusk1</item>
         <item name="colorPrimaryDark">@color/colorDusk2</item>
         <item name="colorAccent">@color/colorBlueA700</item>
@@ -66,14 +64,12 @@
         <item name="colorInactiveSwitchBackground">@color/colorLighterGrey</item>
         <item name="colorSeparator">@color/colorHazyDusk</item>
         <item name="colorCaption">@color/colorHazyDay</item>
-
     </style>
 
 
+    <!--transitions-->
 
-    <style name="Window" />
-
-    <style name="Window.Transition" />
+    <style name="Window.Transition" parent="" />
 
     <style name="Window.Transition.ThemeSwitch">
         <item name="android:windowEnterAnimation">@anim/window_fade_in</item>
@@ -82,9 +78,7 @@
 
 
 
-    <style name="Widget" />
-
-    <style name="Widget.App" />
+    <style name="Widget.App" parent="" />
 
     <style name="Widget.App.ProgressBar">
         <item name="android:progressDrawable">@drawable/circular_progress_bar</item>
@@ -102,7 +96,6 @@
 
 
     <style name="Widget.App.Dialog">
-
     </style>
 
     <style name="Widget.App.Dialog.InputTextFieldLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
@@ -190,6 +183,11 @@
 
     <style name="TextAppearance.App.Title">
         <item name="android:textSize">20sp</item>
+        <item name="android:letterSpacing">0.016</item>
+    </style>
+
+    <style name="TextAppearance.App.Title.Small">
+        <item name="android:textSize">16sp</item>
         <item name="android:letterSpacing">0.016</item>
     </style>
 

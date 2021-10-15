@@ -1,13 +1,12 @@
 package com.basilalasadi.fasters.model;
 
-import android.os.Bundle;
+import com.basilalasadi.fasters.bloc.CountdownBloc;
+import com.basilalasadi.fasters.logic.TimeProvider;
 
-import androidx.annotation.NonNull;
-
-import com.basilalasadi.fasters.provider.TimeProvider;
-
+import org.jetbrains.annotations.NotNull;
 import org.threeten.bp.LocalTime;
 import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.Duration;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.format.DateTimeFormatterBuilder;
 import org.threeten.bp.temporal.ChronoField;
@@ -73,41 +72,53 @@ public final class CountdownViewModel {
 	public final long countDownStartTime;
 	public final long countDownEndTime;
 	public final String location;
-	public final long timeTillNextPrayer;
-	public final String nextPrayer;
+	public final int nextPrayerIndex;
+	public final String nextPrayerName;
 	public final double[] prayerTimes;
-	public final int nextPrayerTime;
+	public final int nextPrayerId;
 	public final int zone;
 	public final ZonedDateTime expires;
 	
-	public CountdownViewModel(int flags, boolean isEvening, long countDownStartTime, long countDownEndTime, String location, long timeTillNextPrayer,
-			String nextPrayer, double[] prayerTimes, int nextPrayerTime, int zone, ZonedDateTime expires) {
+	public CountdownViewModel(int flags, boolean isEvening, long countDownStartTime, long countDownEndTime, String location, int nextPrayerIndex,
+			String nextPrayerName, @NotNull double[] prayerTimes, int nextPrayerId, int zone, ZonedDateTime expires) {
 		
 		this.flags = flags;
 		this.isEvening = isEvening;
 		this.countDownStartTime = countDownStartTime;
 		this.countDownEndTime = countDownEndTime;
 		this.location = location;
-		this.timeTillNextPrayer = timeTillNextPrayer;
-		this.nextPrayer = nextPrayer;
+		this.nextPrayerIndex = nextPrayerIndex;
+		this.nextPrayerName = nextPrayerName;
 		this.prayerTimes = prayerTimes;
-		this.nextPrayerTime = nextPrayerTime;
+		this.nextPrayerId = nextPrayerId;
 		this.zone = zone;
 		this.expires = expires;
 	}
 	
-	public CountdownViewModel(int flags) {
+	private CountdownViewModel(int flags) {
 		this.flags = flags;
 		this.isEvening = false;
 		this.countDownStartTime = -1;
 		this.countDownEndTime = -1;
 		this.location = null;
-		this.timeTillNextPrayer = -1;
-		this.nextPrayer = null;
+		this.nextPrayerIndex = -1;
+		this.nextPrayerName = null;
 		this.prayerTimes = null;
-		this.nextPrayerTime = -1;
+		this.nextPrayerId = -1;
 		this.zone = 0;
 		this.expires = TimeProvider.getDateTime().minusSeconds(1);
+	}
+	
+	public static CountdownViewModel dataLoading() {
+		return new CountdownViewModel(FLAG_DATA_LOADING);
+	}
+	
+	public static CountdownViewModel errorNoLocation() {
+		return new CountdownViewModel(ERROR_NO_LOCATION);
+	}
+	
+	public static CountdownViewModel errorInvalidSettings() {
+		return new CountdownViewModel(ERROR_INVALID_SETTINGS);
 	}
 	
 	@Override
@@ -149,16 +160,45 @@ public final class CountdownViewModel {
 		buf.append(", countDownStartTime: ").append(countDownStartTime);
 		buf.append(", countDownEndTime: ").append(countDownEndTime);
 		buf.append(", location: ").append(location);
-		buf.append(", timeTillNextPrayer: ").append(timeTillNextPrayer);
-		buf.append(", nextPrayer: ").append(nextPrayer);
+		buf.append(", timeTillNextPrayer: ").append(nextPrayerIndex);
+		buf.append(", nextPrayer: ").append(nextPrayerName);
 		buf.append(", prayerTimes: ").append(Arrays.toString(prayerTimes));
-		buf.append(", nextPrayerTime: ").append(nextPrayerTime);
+		buf.append(", nextPrayerTime: ").append(nextPrayerId);
 		buf.append(", zone: ").append(zone);
 		buf.append(", expires: ").append(expires);
 		
 		buf.append(")");
 		
 		return buf.toString();
+	}
+	
+	public String statusString() {
+		int status = flags & 0x0f;
+		int error = flags & 0xf0;
+		
+		if (error != 0) {
+			switch (error) {
+				case ERROR_INVALID_SETTINGS:
+					return "ERROR_INVALID_SETTINGS";
+					
+				case ERROR_NO_LOCATION:
+					return "ERROR_NO_LOCATION";
+				
+				default:
+					return "ERROR_CODE_" + error;
+			}
+		}
+		
+		switch (status) {
+			case FLAG_DATA_AVAILABLE:
+				return "FLAG_DATA_AVAILABLE";
+				
+			case FLAG_DATA_LOADING:
+				return "FLAG_DATA_LOADING";
+			
+			default:
+				return "STATUS_CODE_" + status;
+		}
 	}
 	
 	public boolean isDataAvailable() {
@@ -204,12 +244,32 @@ public final class CountdownViewModel {
 		return timings;
 	}
 	
-	public String getFormattedNextTiming() {
-		return formatTiming(prayerTimes[nextPrayerTime]);
+	public long getTimeTillNextPrayer(ZonedDateTime now) {
+		ZonedDateTime nextPrayerTime;
+		
+		if (nextPrayerIndex == 5) {
+			nextPrayerTime = CountdownBloc.datetimeFromTiming(now, prayerTimes[5], 1);
+		}
+		else {
+			nextPrayerTime = CountdownBloc.datetimeFromTiming(now, prayerTimes[nextPrayerId]);
+		}
+		
+		return Duration.between(now, nextPrayerTime).getSeconds();
 	}
 	
 	public String formatTiming(double timing) {
 		LocalTime t = LocalTime.ofSecondOfDay((long)(timing * 3600));
 		return TIME_FORMATTER_HH_MM_AMPM.format(t);
+	}
+	
+	public ZonedDateTime[] getDayTimings(ZonedDateTime now) {
+		ZonedDateTime[] times = new ZonedDateTime[6];
+		
+		for (int i = 0; i < 5; i++) {
+			times[i] = CountdownBloc.datetimeFromTiming(now, prayerTimes[i]);
+		}
+		times[5] = CountdownBloc.datetimeFromTiming(now, prayerTimes[5], 1);
+		
+		return times;
 	}
 }
