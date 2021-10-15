@@ -118,7 +118,7 @@ public abstract class AstronomyMath {
 		final double L = latitude * PI / 180;
 		final double D = solarDeclination(daysSinceEpoch);
 		
-		final double nom = sin(acot(t + tan(L - D))) - sin(L) * sin(D);
+		final double nom = sin(acot(shadowLength + tan(L - D))) - sin(L) * sin(D);
 		final double denom = cos(L) * cos(D);
 		
 		final double f = nom / denom;
