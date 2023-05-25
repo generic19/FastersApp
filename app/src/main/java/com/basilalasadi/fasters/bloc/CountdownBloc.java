@@ -4,9 +4,10 @@ import android.content.Context;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.math.PrayerTimings;
+import com.basilalasadi.fasters.math.TimingsMethod;
 import com.basilalasadi.fasters.model.CountdownViewModel;
 import com.basilalasadi.fasters.logic.settings.SettingsManager;
-import com.basilalasadi.fasters.logic.TimeProvider;
+import com.basilalasadi.fasters.util.TimeProvider;
 
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.chrono.HijrahDate;
@@ -83,7 +84,7 @@ public class CountdownBloc {
 			return;
 		}
 		
-		ZonedDateTime now = TimeProvider.getDateTime();
+		ZonedDateTime now = TimeProvider.now();
 		HijrahDate hijriDate = HijrahDate.from(now);
 		boolean isRamadan = hijriDate.get(ChronoField.MONTH_OF_YEAR) == 9;
 		
@@ -100,16 +101,16 @@ public class CountdownBloc {
 		
 		
 		if (customMethod.useAutomatic()) {
-			PrayerTimings.Method method = PrayerTimings.getMethodForCountry(address.country);
+			TimingsMethod method = TimingsMethod.getDefaultForCountry(address.country);
 			
-			fajrAngleDegrees = PrayerTimings.getFajrAngleDegrees(method);
-			useFixedTimeOffset = PrayerTimings.getHasFixedIshaOffset(method);
+			fajrAngleDegrees = method.getFajrAngleDegrees();
+			useFixedTimeOffset = method.usesFixedOffsetForIsha();
 			
 			if (useFixedTimeOffset) {
-				ishaFixedTimeOffset = (int) PrayerTimings.getIshaFixedOffset(method, isRamadan);
+				ishaFixedTimeOffset = (int) method.getIshaFixedOffset(isRamadan);
 			}
 			else {
-				ishaAngleDegrees = PrayerTimings.getIshaAngleDegrees(method);
+				ishaAngleDegrees = method.getIshaAngleDegrees();
 			}
 			
 			useShafaiMethod = false;
@@ -228,11 +229,24 @@ public class CountdownBloc {
 	}
 	
 	public static ZonedDateTime datetimeFromTiming(ZonedDateTime now, double time) {
+		int daysOffset = 0;
+		
+		while (time < 0) {
+			time += 24;
+			daysOffset--;
+		}
+		while (time >= 24) {
+			time -= 24;
+			daysOffset++;
+		}
+		
 		int hour = (int) time;
 		int minute = (int) ((time - hour) * 60);
 		int second = (int) ((time - hour - minute / 60.0) * 3600);
 		
-		return now.withHour(hour)
+		return now
+				.plusDays(daysOffset)
+				.withHour(hour)
 				.withMinute(minute)
 				.withSecond(second);
 	}

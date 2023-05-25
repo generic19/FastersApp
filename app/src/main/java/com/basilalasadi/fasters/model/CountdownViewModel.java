@@ -1,7 +1,7 @@
 package com.basilalasadi.fasters.model;
 
 import com.basilalasadi.fasters.bloc.CountdownBloc;
-import com.basilalasadi.fasters.logic.TimeProvider;
+import com.basilalasadi.fasters.util.TimeProvider;
 
 import org.jetbrains.annotations.NotNull;
 import org.threeten.bp.LocalTime;
@@ -47,17 +47,6 @@ public final class CountdownViewModel {
 	public static final int ERROR_NO_LOCATION = 0x10;
 	public static final int ERROR_INVALID_SETTINGS = 0x20;
 	
-	private static final String KEY_FLAGS = "flags";
-	private static final String KEY_IS_EVENING = "isEvening";
-	private static final String KEY_COUNT_DOWN_END_TIME = "countDownEndTime";
-	private static final String KEY_COUNT_DOWN_PROGRESS = "countDownProgress";
-	private static final String KEY_LOCATION = "location";
-	private static final String KEY_TIME_TILL_NEXT_PRAYER = "timeTillNextPrayer";
-	private static final String KEY_NEXT_PRAYER = "nextPrayer";
-	private static final String KEY_PRAYER_TIMES = "prayerTimes";
-	private static final String KEY_NEXT_PRAYER_TIME = "nextPrayerTime";
-	private static final String KEY_ZONE = "zone";
-	
 	private static final DateTimeFormatter TIME_FORMATTER_HH_MM_AMPM =
 			new DateTimeFormatterBuilder().parseCaseInsensitive()
 					.appendValue(ChronoField.CLOCK_HOUR_OF_AMPM)
@@ -79,8 +68,9 @@ public final class CountdownViewModel {
 	public final int zone;
 	public final ZonedDateTime expires;
 	
-	public CountdownViewModel(int flags, boolean isEvening, long countDownStartTime, long countDownEndTime, String location, int nextPrayerIndex,
-			String nextPrayerName, @NotNull double[] prayerTimes, int nextPrayerId, int zone, ZonedDateTime expires) {
+	public CountdownViewModel(int flags, boolean isEvening, long countDownStartTime, long countDownEndTime,
+			String location, int nextPrayerIndex, String nextPrayerName, double @NotNull [] prayerTimes,
+			int nextPrayerId, int zone, ZonedDateTime expires) {
 		
 		this.flags = flags;
 		this.isEvening = isEvening;
@@ -106,7 +96,7 @@ public final class CountdownViewModel {
 		this.prayerTimes = null;
 		this.nextPrayerId = -1;
 		this.zone = 0;
-		this.expires = TimeProvider.getDateTime().minusSeconds(1);
+		this.expires = TimeProvider.now().minusSeconds(1);
 	}
 	
 	public static CountdownViewModel dataLoading() {
@@ -121,6 +111,7 @@ public final class CountdownViewModel {
 		return new CountdownViewModel(ERROR_INVALID_SETTINGS);
 	}
 	
+	@NotNull
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
@@ -231,7 +222,7 @@ public final class CountdownViewModel {
 	}
 	
 	public boolean isExpired() {
-		return !TimeProvider.getDateTime().isBefore(expires);
+		return !TimeProvider.now().isBefore(expires);
 	}
 	
 	public String[] getFormattedTimings() {
@@ -258,6 +249,13 @@ public final class CountdownViewModel {
 	}
 	
 	public String formatTiming(double timing) {
+		while (timing < 0) {
+			timing += 24;
+		}
+		while (timing >= 24) {
+			timing -= 24;
+		}
+		
 		LocalTime t = LocalTime.ofSecondOfDay((long)(timing * 3600));
 		return TIME_FORMATTER_HH_MM_AMPM.format(t);
 	}

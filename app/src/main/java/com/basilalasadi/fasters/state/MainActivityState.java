@@ -1,5 +1,7 @@
 package com.basilalasadi.fasters.state;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -13,6 +15,8 @@ import com.basilalasadi.fasters.bloc.CountdownBloc;
 import com.basilalasadi.fasters.bloc.CountdownBloc.LoadTimingsEvent;
 import com.basilalasadi.fasters.bloc.CountdownBloc.StateStreamConsumer;
 import com.basilalasadi.fasters.controller.MainActivityController;
+import com.basilalasadi.fasters.logic.settings.LocationSetListener;
+import com.basilalasadi.fasters.logic.settings.SettingsManager;
 import com.basilalasadi.fasters.model.CountdownViewModel;
 import com.basilalasadi.fasters.view.MainActivity;
 
@@ -84,6 +88,10 @@ public class MainActivityState extends ActivityState<MainActivity> implements St
 	
 	void sendLoadTimingsEvent() {
 		bloc.addEvent(new LoadTimingsEvent(controller.getCurrentContext()));
+	}
+	
+	public void onLocationSet() {
+		sendLoadTimingsEvent();
 	}
 	
 	@Override

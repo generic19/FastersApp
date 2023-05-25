@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.logic.settings.SettingsManager;
-import com.basilalasadi.fasters.logic.TimeProvider;
+import com.basilalasadi.fasters.util.TimeProvider;
 import com.basilalasadi.fasters.view.MainActivity;
 
 import java.util.ArrayList;
@@ -48,14 +48,17 @@ public class ReminderPublisher extends BroadcastReceiver {
 		
 		Log.d(TAG, reminderIntent.toString());
 		
-		if (!SettingsManager.getInstance(context).isReminderEnabled(context, reminderIntent.getReminderIndex())) {
+		SettingsManager settingsManager = SettingsManager.getInstance(context);
+		
+		if (!settingsManager.areNotificationsEnabled(context) ||
+				!settingsManager.isReminderEnabled(context, reminderIntent.getReminderIndex())) {
 			return;
 		}
 		
 		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		createChannels(context, manager);
 		
-		int dayOfYear = TimeProvider.getDateTime().getDayOfYear();
+		int dayOfYear = TimeProvider.now().getDayOfYear();
 		int randInt = Math.abs((new Random(dayOfYear)).nextInt());
 		
 		String title;

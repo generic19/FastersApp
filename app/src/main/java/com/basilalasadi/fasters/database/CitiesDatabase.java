@@ -20,11 +20,9 @@ import java.util.ArrayList;
  * Handler singleton class for worldcities database.
  */
 public final class CitiesDatabase {
-	private static final String DATABASE_NAME = "worldcities";
-
 	private static CitiesDatabase instance;
 	private SQLiteDatabase database;
-	protected final Object mutex = new Object();
+	private final Object mutex = new Object();
 	
 	/**
 	 * Returns singleton instance of CitiesDatabase, or construsts it if not already constructed.
@@ -65,14 +63,13 @@ public final class CitiesDatabase {
 		synchronized (mutex) {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 			
-			SettingsManager settingsManager = SettingsManager.getInstance(context);
-			
-			final String versionKey = context.getString(R.string.key_database_version_template, DATABASE_NAME);
+			final String databaseName = context.getString(R.string.database_name);
+			final String versionKey = context.getString(R.string.key_database_version_template, databaseName);
 			
 			final int latestVersion = Integer.parseInt(context.getString(R.string.latest_database_worldcities_version));
 			int version = prefs.getInt(versionKey, 1);
 			
-			AssetDatabase assetDatabase = new AssetDatabase(context, DATABASE_NAME);
+			AssetDatabase assetDatabase = new AssetDatabase(context, databaseName);
 			
 			if (version < latestVersion) {
 				assetDatabase.deleteDatabase();

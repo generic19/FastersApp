@@ -43,7 +43,7 @@ public class FastersApplication extends Application implements SettingsChangeLis
 	
 	@Override
 	public void onSettingsChnage(SharedPreferences prefs, String key) {
-		if (key.equals(getString(R.string.settings_key_theme))) {
+		if (key.equals("theme")) {
 			updateTheme(null);
 		}
 	}

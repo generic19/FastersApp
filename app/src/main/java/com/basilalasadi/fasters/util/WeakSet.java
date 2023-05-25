@@ -1,8 +1,5 @@
 package com.basilalasadi.fasters.util;
 
-import android.util.SparseArray;
-import android.util.SparseIntArray;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

@@ -178,7 +178,7 @@
 
                 </TableRow>
 
-                <Space android:layout_height="18dp" />
+                <android.widget.Space android:layout_height="18dp" />
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -248,7 +248,7 @@
 
                 </TableRow>
 
-                <Space android:layout_height="18dp" />
+                <android.widget.Space android:layout_height="18dp" />
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -272,7 +272,7 @@
 
                 </TableRow>
 
-                <Space android:layout_height="18dp" />
+                <android.widget.Space android:layout_height="18dp" />
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -296,7 +296,7 @@
 
                 </TableRow>
 
-                <Space android:layout_height="18dp" />
+                <android.widget.Space android:layout_height="18dp" />
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -320,7 +320,7 @@
 
                 </TableRow>
 
-                <Space android:layout_height="18dp" />
+                <android.widget.Space android:layout_height="18dp" />
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -346,7 +346,7 @@
 
             </TableLayout>
 
-            <Space
+            <android.widget.Space
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
 

@@ -8,11 +8,12 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.basilalasadi.fasters.bloc.CountdownBloc;
 import com.basilalasadi.fasters.model.CountdownViewModel;
-import com.basilalasadi.fasters.logic.TimeProvider;
+import com.basilalasadi.fasters.util.TimeProvider;
 
 import org.threeten.bp.Duration;
 import org.threeten.bp.ZonedDateTime;
@@ -29,7 +30,6 @@ public class RemindersService extends JobService implements CountdownBloc.StateS
 	private JobScheduler jobScheduler;
 	private AlarmManager alarmManager;
 	private JobParameters jobParameters = null;
-	
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -93,11 +93,11 @@ public class RemindersService extends JobService implements CountdownBloc.StateS
 					errorMessage = "Error starting reminders service.";
 			}
 			
-			Log.d(TAG, errorMessage);
+			Log.e(TAG, errorMessage);
 			jobFinished(jobParameters, false);
 		}
 		else if (viewModel.isDataAvailable()) {
-			ZonedDateTime now = TimeProvider.getDateTime();
+			ZonedDateTime now = TimeProvider.now();
 			
 			ZonedDateTime[] dayTimings = viewModel.getDayTimings(now);
 			
@@ -160,7 +160,7 @@ public class RemindersService extends JobService implements CountdownBloc.StateS
 		
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, getEpochMillis(time), pendingIntent);
 		
-		Log.d(TAG, String.format("Scheduled %s for %s.", intent.toString(), time.toString()));
+		Log.d(TAG, String.format("Scheduled %s for %s.", intent, time));
 	}
 	
 	private static long getEpochMillis(ZonedDateTime dt) {

@@ -28,11 +28,13 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 	
 	private static SettingsManager instance;
 	private final Set<SettingsChangeListener> listeners = new WeakSet<>();
+	private final Set<LocationSetListener> locationSetListeners = new WeakSet<>();
 	private final HashMap<String, WeakSet<ValueListeners.ValueListener>> valueListeners = new HashMap<>();
 	private WeakReference<SharedPreferences> lastPreference = new WeakReference<>(null);
 	
 	
 	public static SettingsManager getInstance(Context context) {
+		Log.d("SettingsManager", "getInstance() called.");
 		if (instance == null) {
 			instance = new SettingsManager(context);
 		}
@@ -54,9 +56,15 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 	
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		Log.d("SettingsManager", "preference change for key: " + key);
+		
 		for (SettingsChangeListener listener : listeners) {
 			if (listener != null) {
+				Log.d("SettingsManager", "notifying listener: " + listener.getClass().getSimpleName());
 				listener.onSettingsChnage(prefs, key);
+			}
+			else {
+				Log.d("SettingsManager", "null listener found.");
 			}
 		}
 		
@@ -76,7 +84,17 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 	 * @param listener listener
 	 */
 	public void addSettingsChangeListener(SettingsChangeListener listener) {
+		Log.d("SettingsManager", "added listener: " + listener.getClass().getSimpleName());
 		listeners.add(listener);
+	}
+	
+	/**
+	 * Add a listener to be notified when the location is set.
+	 * @param listener listener
+	 */
+	public void addLocationSetListener(LocationSetListener listener) {
+		Log.d("SettingsManager", "added location set listener: " + listener.getClass().getSimpleName());
+		locationSetListeners.add(listener);
 	}
 	
 	/**
@@ -85,6 +103,14 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 	 */
 	public void removeSettingsChangeListener(SettingsChangeListener listener) {
 		listeners.remove(listener);
+	}
+	
+	/**
+	 * Removes specified listener.
+	 * @param listener listener to remove
+	 */
+	public void removeLocationSetListener(LocationSetListener listener) {
+		locationSetListeners.remove(listener);
 	}
 	
 	/**
@@ -113,6 +139,18 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 		
 		if (set != null) {
 			set.remove(listener);
+		}
+	}
+	
+	/**
+	 * Notifies all location set listeners.
+	 */
+	private void notifyLocationSetListeners() {
+		for (LocationSetListener listener : locationSetListeners) {
+			if (listener != null) {
+				Log.d("SettingsManager", "notifying location set listener: " + listener.getClass().getSimpleName());
+				listener.onLocationSet();
+			}
 		}
 	}
 	
@@ -287,6 +325,8 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 		setAddress(context, address);
 		setCoordinates(context, new Coordinates(location));
 		
+		notifyLocationSetListeners();
+		
 		return true;
 	}
 	
@@ -307,6 +347,8 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 		
 		setAddress(context, new Address(addr.country, addr.admin, addr.city));
 		setCoordinates(context, coordinates);
+		
+		notifyLocationSetListeners();
 		
 		return true;
 	}
@@ -498,6 +540,10 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 		}
 		
 		return flags;
+	}
+	
+	public boolean areNotificationsEnabled(Context context) {
+		return getPrefs(context).getBoolean(context.getString(R.string.settings_key_all_notifications), true);
 	}
 	
 	public boolean isReminderEnabled(Context context, int reminderIndex) {

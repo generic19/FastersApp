@@ -30,10 +30,11 @@ import com.basilalasadi.fasters.BuildConfig;
 import com.basilalasadi.fasters.FastersApplication;
 import com.basilalasadi.fasters.R;
 import com.basilalasadi.fasters.controller.MainActivityController;
+import com.basilalasadi.fasters.logic.settings.LocationSetListener;
 import com.basilalasadi.fasters.model.CountdownViewModel;
 import com.basilalasadi.fasters.logic.ReminderConstants;
 import com.basilalasadi.fasters.logic.settings.SettingsManager;
-import com.basilalasadi.fasters.logic.TimeProvider;
+import com.basilalasadi.fasters.util.TimeProvider;
 import com.basilalasadi.fasters.service.ReminderIntent;
 import com.basilalasadi.fasters.service.RemindersService;
 import com.basilalasadi.fasters.state.ActivityState;
@@ -47,7 +48,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MainActivity extends AppCompatActivity implements MainActivityController {
+public class MainActivity extends AppCompatActivity implements MainActivityController, LocationSetListener {
 	private static final String TAG = "MainActivity";
 	private static final boolean DEBUG_TOOLS = false;
 	
@@ -151,6 +152,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		if (setActivityTheme()) {
 			recreate();
 		}
+		
+		SettingsManager.getInstance(this).addLocationSetListener(this);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		SettingsManager.getInstance(this).removeLocationSetListener(this);
 	}
 	
 	@Override
@@ -159,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 	}
 	
 	public void updateView() {
-		ZonedDateTime now = TimeProvider.getDateTime();
+		ZonedDateTime now = TimeProvider.now();
 		CountdownViewModel viewModel = state.getViewModel();
 		
 		if (viewModel != null) {
@@ -234,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 	}
 	
 	public void updateCountdown() {
-		ZonedDateTime now = TimeProvider.getDateTime();
+		ZonedDateTime now = TimeProvider.now();
 		updateCountdown(now);
 	}
 	
@@ -455,6 +465,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
 		else {
 			return typedValue.getFloat();
 		}
+	}
+	
+	/**
+	 * Callback for SettingsManager on location set.
+	 */
+	@Override
+	public void onLocationSet() {
+		state.onLocationSet();
 	}
 	
 	/**

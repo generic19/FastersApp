@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Fasters</string>
+
+    <string name="database_name">worldcities</string>
     <string name="key_database_version_template">database_%s_version</string>
     <string name="latest_database_worldcities_version">3</string>
 
@@ -148,5 +150,6 @@
     <string name="preference_summary_prepare_breakfast_reminder">Reminds you to prepare a meal 2 hours before breakfast time.</string>
     <string name="preference_summary_breakfast_reminder">Reminds you to prepare to eat 15 minutes before breakfast time.</string>
     <string name="countdown_location_initial_text">countdown</string>
+    <string name="title_open_source_licenses">Open-source Licenses</string>
 
 </resources>
