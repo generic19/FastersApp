@@ -1,21 +1,14 @@
 package com.basilalasadi.fasters.view.settings;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceFragmentCompat;
 import org.jetbrains.annotations.NotNull;
 
 import com.basilalasadi.fasters.R;
-import com.basilalasadi.fasters.view.AppTheme;
 import com.mikepenz.aboutlibraries.LibsBuilder;
-import com.mikepenz.aboutlibraries.ui.LibsSupportFragment;
-
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 	

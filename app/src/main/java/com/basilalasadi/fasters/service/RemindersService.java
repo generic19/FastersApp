@@ -8,7 +8,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 
 import com.basilalasadi.fasters.bloc.CountdownBloc;
@@ -43,7 +43,7 @@ public class RemindersService extends JobService implements CountdownBloc.StateS
 		jobScheduler.cancel(JOB_ID);
 		jobScheduler.schedule(jobInfo);
 		
-		Log.d(TAG, "Starting reminders service from boot (up to 1 minute)..");
+		Log.d(TAG, "Starting reminders service within 60 seconds..");
 		
 		stopSelf(startId);
 		return START_NOT_STICKY;
@@ -154,9 +154,14 @@ public class RemindersService extends JobService implements CountdownBloc.StateS
 	
 	private void scheduleReminder(ZonedDateTime time, int reminderIndex, String extra) {
 		Log.d(TAG, "Scheduling reminder (" + reminderIndex + ")..");
-		
+
+		if (Build.VERSION.SDK_INT >= 31 && !alarmManager.canScheduleExactAlarms()) {
+			Log.d(TAG, "Need permission to schedule exact alarms.");
+			return;
+		}
+
 		ReminderIntent intent = new ReminderIntent(this, reminderIndex, extra);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, getEpochMillis(time), pendingIntent);
 		

@@ -5,7 +5,7 @@
         app:key="all_notifications"
         android:layout="@layout/preference_card"
         app:title="Notifications"
-        app:defaultValue="true"
+        app:defaultValue="false"
         app:allowDividerBelow="false"/>
 
     <PreferenceCategory

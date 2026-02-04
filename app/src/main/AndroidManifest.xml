@@ -42,11 +42,19 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="@string/action_start_reminders_service" />
             </intent-filter>
         </service>
 
         <receiver android:name=".service.ReminderPublisher"
             android:exported="false">
+        </receiver>
+
+        <receiver android:name=".receivers.ExactAlarmPermissionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
         </receiver>
 
     </application>

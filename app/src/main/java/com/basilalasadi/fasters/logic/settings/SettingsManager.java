@@ -56,7 +56,7 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 	
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-		Log.d("SettingsManager", "preference change for key: " + key);
+		Log.d("SettingsManager", "preference change for key " + key);
 		
 		for (SettingsChangeListener listener : listeners) {
 			if (listener != null) {
@@ -181,7 +181,7 @@ public final class SettingsManager implements SharedPreferences.OnSharedPreferen
 		
 		editor.putBoolean(context.getString(R.string.settings_key_shafai_method), false)
 		      .putBoolean(context.getString(R.string.settings_key_use_ramadan_offset), false)
-		      .putBoolean(context.getString(R.string.settings_key_all_notifications), true)
+		      .putBoolean(context.getString(R.string.settings_key_all_notifications), false)
 		      .putBoolean(context.getString(R.string.settings_key_prefast_meal_reminder), true)
 		      .putBoolean(context.getString(R.string.settings_key_water_reminder), true)
 		      .putBoolean(context.getString(R.string.settings_key_prepare_breakfast_reminder), true)

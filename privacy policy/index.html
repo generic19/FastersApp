@@ -1,0 +1,55 @@
+<html lang="en" style="min-width: 300px;">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        /*
+        * Bootstrap  v5.2.3 (https://getbootstrap.com/)
+        * Copyright 2011-2022 The Bootstrap Authors
+        * Copyright 2011-2022 Twitter, Inc.
+        * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+        */
+        :root{--bs-blue:#0d6efd;--bs-indigo:#6610f2;--bs-purple:#6f42c1;--bs-pink:#d63384;--bs-red:#dc3545;--bs-orange:#fd7e14;--bs-yellow:#ffc107;--bs-green:#198754;--bs-teal:#20c997;--bs-cyan:#0dcaf0;--bs-black:#000;--bs-white:#fff;--bs-gray:#6c757d;--bs-gray-dark:#343a40;--bs-gray-100:#f8f9fa;--bs-gray-200:#e9ecef;--bs-gray-300:#dee2e6;--bs-gray-400:#ced4da;--bs-gray-500:#adb5bd;--bs-gray-600:#6c757d;--bs-gray-700:#495057;--bs-gray-800:#343a40;--bs-gray-900:#212529;--bs-primary:#0d6efd;--bs-secondary:#6c757d;--bs-success:#198754;--bs-info:#0dcaf0;--bs-warning:#ffc107;--bs-danger:#dc3545;--bs-light:#f8f9fa;--bs-dark:#212529;--bs-primary-rgb:13,110,253;--bs-secondary-rgb:108,117,125;--bs-success-rgb:25,135,84;--bs-info-rgb:13,202,240;--bs-warning-rgb:255,193,7;--bs-danger-rgb:220,53,69;--bs-light-rgb:248,249,250;--bs-dark-rgb:33,37,41;--bs-white-rgb:255,255,255;--bs-black-rgb:0,0,0;--bs-body-color-rgb:33,37,41;--bs-body-bg-rgb:255,255,255;--bs-font-sans-serif:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";--bs-font-monospace:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;--bs-gradient:linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));--bs-body-font-family:var(--bs-font-sans-serif);--bs-body-font-size:1rem;--bs-body-font-weight:400;--bs-body-line-height:1.5;--bs-body-color:#212529;--bs-body-bg:#fff;--bs-border-width:1px;--bs-border-style:solid;--bs-border-color:#dee2e6;--bs-border-color-translucent:rgba(0, 0, 0, 0.175);--bs-border-radius:0.375rem;--bs-border-radius-sm:0.25rem;--bs-border-radius-lg:0.5rem;--bs-border-radius-xl:1rem;--bs-border-radius-2xl:2rem;--bs-border-radius-pill:50rem;--bs-link-color:#0d6efd;--bs-link-hover-color:#0a58ca;--bs-code-color:#d63384;--bs-highlight-bg:#fff3cd}*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:var(--bs-body-font-family);font-size:var(--bs-body-font-size);font-weight:var(--bs-body-font-weight);line-height:var(--bs-body-line-height);color:var(--bs-body-color);text-align:var(--bs-body-text-align);background-color:var(--bs-body-bg);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}h1,h3{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}p{margin-top:0;margin-bottom:1rem}a{color:var(--bs-link-color);text-decoration:underline}a:hover{color:var(--bs-link-hover-color)}svg{vertical-align:middle}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}::file-selector-button{font:inherit;-webkit-appearance:button}.display-3{font-size:calc(1.525rem + 3.3vw);font-weight:300;line-height:1.2}@media (min-width:1200px){.display-3{font-size:4rem}}.container{--bs-gutter-x:1.5rem;--bs-gutter-y:0;width:100%;padding-right:calc(var(--bs-gutter-x) * .5);padding-left:calc(var(--bs-gutter-x) * .5);margin-right:auto;margin-left:auto}@media (min-width:576px){.container{max-width:540px}}@media (min-width:768px){.container{max-width:720px}}@media (min-width:992px){.container{max-width:960px}}@media (min-width:1200px){.container{max-width:1140px}}@media (min-width:1400px){.container{max-width:1320px}}:not(.btn-check)+.btn:active:focus-visible{box-shadow:var(--bs-btn-focus-box-shadow)}.d-flex{display:flex!important}.justify-content-center{justify-content:center!important}.align-items-center{align-items:center!important}.mx-4{margin-right:1.5rem!important;margin-left:1.5rem!important}.mt-4{margin-top:1.5rem!important}.mt-5{margin-top:3rem!important}.mb-3{margin-bottom:1rem!important}.mb-4{margin-bottom:1.5rem!important}.bg-dark{--bs-bg-opacity:1;background-color:rgba(var(--bs-dark-rgb),var(--bs-bg-opacity))!important}
+    </style>
+    
+    <title>Fasters Privacy Policy</title>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-center align-items-center mt-5">
+            <svg xmlns="http://www.w3.org/2000/svg" height="80" viewBox="0 0 189.594 162.687">
+                <path style="fill: #464955;" class="cls-1" d="M240.412,115.784a42.011,42.011,0,0,0,2.912-7.475,42.954,42.954,0,0,0,1.5-8.854,45.226,45.226,0,0,0-.575-10.407,9.657,9.657,0,0,0-2.9-4.918,25.982,25.982,0,0,0-6.435-4.692,35.1,35.1,0,0,0-8.712-3.2,24.94,24.94,0,0,0-9.71-.308q-4.776.778-11.675,5.682a83.76,83.76,0,0,0-13.881,12.762,138.263,138.263,0,0,0-15.161,20.811A177.339,177.339,0,0,0,163.3,140.458a22.549,22.549,0,0,1-3.365.828l-3.137.511a49.386,49.386,0,0,1-8.43.674,33.389,33.389,0,0,1-8.311-1.166,73.975,73.975,0,0,0-4.214-6.1,64.658,64.658,0,0,0-5.531-6.449l-4.879,17.315a51.1,51.1,0,0,1,9.187,12.994,53.61,53.61,0,0,1,5.134,15.614c1.615,9.91-.765,16.773-2.752,22.325-2.233,5.776-5.564,11.288-13.156,16.669-2.978,2.151-7.443,3.471-13.978,4.715a72,72,0,0,1-17.951,1.105,43.561,43.561,0,0,1-14.063-2.959,25.568,25.568,0,0,1-9.63-6.691c-2.467-2.819-4.595-6.177-4.677-10.229-0.859-42.682,28.705-74.92,39.182-90.785l-2.747-.533C67.849,150.027,51.674,172.062,56,205c1.257,9.57,8.005,21.788,16.377,27.333,8.263,5.465,18.014,6.83,29.445,5.423,18.648-2.3,34.484-15.305,38.848-28.229a106.7,106.7,0,0,0,4.773-50.619,47.547,47.547,0,0,0,13.382-.361q-0.333,3.977-.551,7.79T158,174.083a14.445,14.445,0,0,0,1.365,2.788,5.965,5.965,0,0,0,1.437,1.516l0.682-.111q0.566-5.973,1.346-11.07t1.591-9.57a209.909,209.909,0,0,0,27.992-7.36,148.44,148.44,0,0,0,21.012-8.954,80.019,80.019,0,0,0,14.6-9.659,48.334,48.334,0,0,0,8.747-9.475Q238.661,119.221,240.412,115.784Zm-20.03-20.678a27.955,27.955,0,0,1,6.16,2.147,35.753,35.753,0,0,1,5.746,3.474,40.182,40.182,0,0,1,4.722,4.06q-1.1,2.7-5.83,7.181a69.115,69.115,0,0,1-12.79,9.154,159.775,159.775,0,0,1-19.334,9.8A120.579,120.579,0,0,1,180.235,137q-2.819.743-4.911,1.221t-4.41.858a122.494,122.494,0,0,1,11-17.543,109.848,109.848,0,0,1,12-13.575,75.807,75.807,0,0,1,11.4-9.069,26.222,26.222,0,0,1,9.215-4.022A15.6,15.6,0,0,1,220.382,95.106Z" transform="translate(-55.313 -75.594)"/>
+            </svg>
+            
+            <div class="bg-dark mx-4" style="width: 1px; height: 90px"></div>
+            
+            <div class="display-3 mb-3">Fasters</div>
+        </div>
+        
+        <h1 class="mt-5 mb-4">Privacy Policy</h1>
+        
+        <p>
+            We are not interested in collecting any personal information.
+            We believe that developers have a responsibility to protect the user's privacy.
+            Fasters does not collect or share any personal information, nor does it include analytics or advertising.
+        </p>
+        
+        <h3 class="mt-4 mb-3">What information do we collect?</h3>
+        
+        <p>
+            Fasters does not collect any information or connect to the internet.
+            Fasters stores on your device your approximate location to provide you with the appoperiate prayer timings
+            in your city.    
+        </p>
+        
+        <h3 class="mt-4 mb-3">Contact</h3>
+        
+        <p>
+            If you have any questions or concerns, please feel free to contact us at
+            <a href="mailto:support@fasters.basilalasadi.com">support@fasters.basilalasadi.com</a>.
+        </p>
+    </div>
+</body>
+</html>

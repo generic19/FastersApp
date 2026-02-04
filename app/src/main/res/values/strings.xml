@@ -5,6 +5,14 @@
     <string name="key_database_version_template">database_%s_version</string>
     <string name="latest_database_worldcities_version">3</string>
 
+
+    <!--Actions-->
+
+    <string name="action_start_reminders_service">com.basilalasadi.fasters.START_REMINDERS_SERVICE</string>
+
+
+    <!--Labels-->
+
     <string name="set_location">Set Location</string>
     <string name="city">City</string>
     <string name="country">Country</string>
@@ -75,6 +83,11 @@
     <string name="settings_key_prepare_breakfast_reminder">prepare_breakfast_reminder</string>
     <string name="settings_key_breakfast_near_reminder">breakfast_near_reminder</string>
     <string name="settings_key_theme">theme</string>
+
+
+    <!--Preferences keys-->
+
+    <string name="preference_should_enable_all_notifications">preference_should_enable_all_notifications</string>
 
 
     <!--List preferences labels and values-->
@@ -151,5 +164,6 @@
     <string name="preference_summary_breakfast_reminder">Reminds you to prepare to eat 15 minutes before breakfast time.</string>
     <string name="countdown_location_initial_text">countdown</string>
     <string name="title_open_source_licenses">Open-source Licenses</string>
+    <string name="not_set">Not set.</string>
 
 </resources>

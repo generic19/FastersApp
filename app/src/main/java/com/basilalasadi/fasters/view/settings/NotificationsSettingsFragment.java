@@ -1,7 +1,12 @@
 package com.basilalasadi.fasters.view.settings;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -30,6 +35,34 @@ public class NotificationsSettingsFragment extends PreferenceFragmentCompat {
         
             startActivity(intent);
         
+            return true;
+        });
+
+        findPreference(getString(R.string.settings_key_all_notifications)).setOnPreferenceChangeListener((preference, newValue) -> {
+            if (Build.VERSION.SDK_INT >= 34 &&
+                    !requireContext().getSystemService(AlarmManager.class).canScheduleExactAlarms()) {
+
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Allow reminders?")
+                        .setMessage("Fasters needs your permission to schedule timely reminders.")
+                        .setPositiveButton("Allow", (dialog, which) -> {
+                            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                                    .edit()
+                                    .putBoolean(getString(R.string.preference_should_enable_all_notifications), true)
+                                    .apply();
+
+                             requireContext().startActivity(new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM));
+                             dialog.dismiss();
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .create()
+                        .show();
+
+                return false;
+            }
+
             return true;
         });
     }
